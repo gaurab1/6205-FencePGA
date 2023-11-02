@@ -22,7 +22,7 @@ module top_level(
   );
   assign led = sw; //for debugging
   //shut up those rgb LEDs (active high):
-  assign rgb1= 0;
+  assign rgb1 = 0;
   assign rgb0 = 0;
 
   //have btnd control system reset
