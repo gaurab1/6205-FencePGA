@@ -30,4 +30,4 @@ simulate: $(HDL_FILES) $(IP_FILES)
 
 .PHONY: clean
 clean:
-	rm -rf $(OBJ_DIR)/* *.vcd $(SIM_DIR)/*.out
+	rm -rf $(OBJ_DIR)/*.bit $(OBJ_DIR)/*.sdfd *.vcd $(SIM_DIR)/*.out
