@@ -4,13 +4,15 @@ module block_sprite #(
   input wire [9:0] vcount_in,
   input wire [10:0] x_in,
   input wire [9:0]  y_in,
+  input wire [10:0] width_in,
+  input wire [9:0]  height_in,
   output logic [7:0] red_out,
   output logic [7:0] green_out,
   output logic [7:0] blue_out);
 
   logic in_sprite;
-  assign in_sprite = ((hcount_in >= x_in && hcount_in < (x_in + WIDTH)) &&
-                      (vcount_in >= y_in && vcount_in < (y_in + HEIGHT)));
+  assign in_sprite = ((hcount_in >= x_in && hcount_in < (x_in + width_in)) &&
+                      (vcount_in >= y_in && vcount_in < (y_in + height_in)));
   always_comb begin
     if (in_sprite)begin
       red_out = COLOR[23:16];
