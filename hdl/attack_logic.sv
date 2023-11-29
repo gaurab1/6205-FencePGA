@@ -7,7 +7,9 @@ module attack_logic (
     input wire [31:0] decoded_ir_in,
     input wire decoded_ir_in_valid,
     input location_t location_in,
-    input location_t location_in_valid,
+    input logic location_in_valid,
+    input wire [2:0] pmod_in,
+    input wire [2:0] pmod_out,
     output data_t player_data_out,
     output data_t opponent_data_out,
     output logic data_out_valid
@@ -28,22 +30,26 @@ module attack_logic (
     .old_player_data_in_valid(fsm_player_data_valid),
     .location_in(location_in),
     .location_in_valid(location_in_valid),
+    .data_out(pmod_out[0]),
+    .data_clk_out(pmod_out[1]),
+    .sel_out(pmod_out[2]),
     .location_out(player_location),
     .location_out_valid(player_location_valid)
   );
-
-  location_t player_location;
+  
   data_t opponent_data;
   logic syncer_data_valid;
+  location_t syncer_player_location;
 
   syncer syncer_inst(
     .clk_pixel_in(clk_pixel_in),
     .rst_in(rst_in),
     .location_in(player_location),
     .location_in_valid(player_location_valid),
-    .opponent_data_in(),
-    .opponent_data_in_valid(),
-    .player_location_out(player_location),
+    .data_in(pmod_in[0]),
+    .data_clk_in(pmod_in[1]),
+    .sel_in(pmod_in[2]),
+    .player_location_out(syncer_player_location),
     .opponent_data_out(opponent_data),
     .data_out_valid(syncer_data_valid)
   );
@@ -54,7 +60,7 @@ module attack_logic (
     .block_in(decoded_ir_in==BLOCK_CODE),
     .lunge_in(decoded_ir_in==LUNGE_CODE),
     .ir_valid_in(decoded_ir_in_valid),
-    .player_location_in(player_location),
+    .player_location_in(syncer_player_location),
     .opponent_data_in(opponent_data),
     .syncer_data_in_valid(syncer_data_valid),
     .player_data_out(fsm_player_data),

@@ -9,6 +9,9 @@ module state_transmitter(
     input wire old_player_data_in_valid,
     input location_t location_in,
     input wire location_in_valid,
+    input wire data_out,
+    input wire data_clk_out,
+    input wire sel_out,
     output data_t location_out,
     output logic location_out_valid
   );
@@ -47,8 +50,6 @@ module state_transmitter(
     end
   end
 
-  logic sel_out;
-
   spi_tx #(
     .DATA_WIDTH($bits(data_t)),
     .DATA_PERIOD(100)
@@ -57,9 +58,9 @@ module state_transmitter(
     .rst_in(rst_in),
     .data_in(new_player_data_in),
     .trigger_in(fsm_data_received && location_data_received),
-    .data_out(),
-    .data_clk_out(),
-    .sel_out()
+    .data_out(data_out),
+    .data_clk_out(data_clk_out),
+    .sel_out(sel_out)
   );
 
   always_ff @(posedge clk_pixel_in) begin

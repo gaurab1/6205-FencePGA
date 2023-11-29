@@ -1,19 +1,19 @@
 param(
-    [string]$tb_name
+    [Parameter(Position = 0)]
+    [string]$tb_name,
+    [string[]]$hdl,
+    [string[]]$ip
 )
 
-$FileNames = Get-ChildItem -Path '.\hdl\' -File
-$IPFileNames = Get-ChildItem -Path '.\ip\'
-
-$IVerilogCommand = "iverilog -g2012 -o sim/" + $tb_name + ".out"
-foreach ($FileName in $FileNames) {
-    $IVerilogCommand += " hdl/" + $FileName
+$IVerilogCommand = "iverilog -g2012 -o sim/" + $tb_name + ".out sim/" + $tb_name + "_tb.sv"
+foreach ($FileName in $hdl) {
+    $IVerilogCommand += " hdl/" + $FileName + ".sv"
 }
-foreach ($IPFileName in $IPFileNames) {
-    $command += " ip/" + $IPFileName + "/" + $IPFileName + ".xci"
+foreach ($IPFileName in $ip) {
+    $IVerilogCommand += " ip/" + $IPFileName + "/" + $IPFileName + ".xci"
 }
 
-$IVerilogCommand += " xdc/top_level.xdc obj/"
+$IverilogCommand += " hdl/types.svh"
 
 Write-Host $IVerilogCommand
 Invoke-Expression $IVerilogCommand
