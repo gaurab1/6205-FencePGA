@@ -32,7 +32,7 @@ module action_fsm(
     .player_y(player_data.location.saber_y),
     .opponent_x(opponent_data.location.saber_x),
     .opponent_y(opponent_data.location.saber_y),
-    .is_colliding(sabers_colliding),
+    .is_colliding(sabers_colliding)
   );
 
   logic attack_intersecting;
@@ -98,7 +98,7 @@ module action_fsm(
           // Increment score
           state <= RECOVER;
         end
-        RECOVER:
+        RECOVER:;
       endcase
     end
   end
