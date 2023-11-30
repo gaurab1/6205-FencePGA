@@ -16,7 +16,8 @@ module top_level(
   output logic [3:0] ss0_an,
   output logic [3:0] ss1_an,
   input wire [7:0] pmoda,
-  input wire [2:0] pmodb,
+  input wire [7:0] pmodb,
+  input wire [5:0] gpio,
   output logic pmodbclk,
   output logic pmodblock
   );
@@ -91,16 +92,14 @@ module top_level(
   //threshold module (apply masking threshold):
   logic [7:0] lower_threshold;
   logic [7:0] upper_threshold;
-  logic mask; //Whether or not thresholded pixel is 1 or 0
+  logic mask_shirt; //Whether or not thresholded pixel is 1 or 0
+  logic mask_saber;
+
 
   //Center of Mass variables (tally all mask=1 pixels for a frame and calculate their center of mass)
-  logic [11:0] x_com, x_com_calc, w_com, w_com_calc; //long term x_com and output from module, resp
-  logic [10:0] y_com, y_com_calc, h_com, h_com_calc; //long term y_com and output from module, resp
-  logic new_com; //used to know when to update x_com and y_com ...
-
-
-  //image_sprite output:
-  logic [7:0] img_red, img_green, img_blue;
+  logic [11:0] x_com, x_com_calc, w_com, w_com_calc, x_com_calc_saber, x_com_saber; //long term x_com and output from module, resp
+  logic [10:0] y_com, y_com_calc, h_com, h_com_calc, y_com_calc_saber, y_com_saber; //long term y_com and output from module, resp
+  logic new_com, new_com_saber; //used to know when to update x_com and y_com ...
 
   //crosshair output:
   logic [7:0] ch_red, ch_green, ch_blue;
@@ -298,24 +297,15 @@ module top_level(
   logic [7:0] r_in_pipe [2:0]; //PS1
   logic [7:0] g_in_pipe [2:0];
   logic [7:0] b_in_pipe [2:0];
-  logic [7:0] img_red_pipe[2:0];
-  logic [7:0] img_green_pipe[2:0];
-  logic [7:0] img_blue_pipe[2:0];
 
   always_ff @(posedge clk_pixel)begin
     r_in_pipe[0] <= fb_red;
     g_in_pipe[0] <= fb_green;
     b_in_pipe[0] <= fb_blue;
-    img_red_pipe[0] <= img_red;
-    img_green_pipe[0] <= img_green;
-    img_blue_pipe[0] <= img_blue;
     for (int i=1; i<3; i = i+1)begin
       r_in_pipe[i] <= r_in_pipe[i-1];
       g_in_pipe[i] <= g_in_pipe[i-1];
       b_in_pipe[i] <= b_in_pipe[i-1];
-      img_red_pipe[i] <= img_red_pipe[i-1];
-      img_green_pipe[i] <= img_green_pipe[i-1];
-      img_blue_pipe[i] <= img_blue_pipe[i-1];
     end
   end
   assign channel_sel = sw[3:1];
@@ -351,18 +341,27 @@ module top_level(
   threshold(
      .clk_in(clk_pixel),
      .rst_in(sys_rst),
-     .pixel_in(selected_channel),
-     .lower_bound_in(lower_threshold),
-     .upper_bound_in(upper_threshold),
-     .mask_out(mask) //single bit if pixel within mask.
+     .pixel_in(cr),
+     .lower_bound_in(lower_threshold),             // 8'b00010000
+     .upper_bound_in(upper_threshold),             // 8'b01111000
+     .mask_out(mask_shirt) //single bit if pixel within mask.
+  );
+
+  threshold(
+     .clk_in(clk_pixel),
+     .rst_in(sys_rst),
+     .pixel_in(b_in_pipe[2]),
+     .lower_bound_in(8'b00110010),
+     .upper_bound_in(8'b01110000),
+     .mask_out(mask_saber) //single bit if pixel within mask.
   );
 
   //modified version of seven segment display for showing
   // thresholds and selected channel
   lab05_ssc mssc(.clk_in(clk_pixel),
                  .rst_in(sys_rst),
-                 .lt_in(h_com[7:0]),
-                 .ut_in(h_com[10:8]),
+                 .lt_in(lower_threshold),
+                 .ut_in(upper_threshold),
                  .channel_sel_in(channel_sel),
                  .cat_out(ss_c),
                  .an_out({ss0_an, ss1_an})
@@ -405,23 +404,24 @@ module top_level(
   //using x_com_calc and y_com_calc values
   //Center of Mass:
 
-  // center_of_mass com_m(
-  //   .clk_in(clk_pixel),
-  //   .rst_in(sys_rst),
-  //   .x_in(h_count_pipe[6]),  // (PS3)
-  //   .y_in(v_count_pipe[6]), // (PS3)
-  //   .valid_in(mask), //aka threshold
-  //   .tabulate_in((new_frame_pipe[6])),
-  //   .x_out(x_com_calc),
-  //   .y_out(y_com_calc),
-  //   .valid_out(new_com)
-  // );
+  center_of_mass com_m(
+    .clk_in(clk_pixel),
+    .rst_in(sys_rst),
+    .x_in(h_count_pipe[6]),  // (PS3)
+    .y_in(v_count_pipe[6]), // (PS3)
+    .valid_in(mask_saber), //aka threshold
+    .tabulate_in((new_frame_pipe[6])),
+    .x_out(x_com_calc_saber),
+    .y_out(y_com_calc_saber),
+    .valid_out(new_com_saber)
+  );
+
   bounding_box bb(
     .clk_in(clk_pixel),
     .rst_in(sys_rst),
     .hcount_in(h_count_pipe[6]),  // (PS3)
     .vcount_in(v_count_pipe[6]), // (PS3)
-    .valid_in(mask), //aka threshold
+    .valid_in(mask_shirt), //aka threshold
     .tabulate_in((new_frame_pipe[6])),
     .x_out(x_com_calc),
     .y_out(y_com_calc),
@@ -435,15 +435,23 @@ module top_level(
   //update center of mass x_com, y_com based on new_com signal
   always_ff @(posedge clk_pixel)begin
     if (sys_rst)begin
+      x_com_saber <= 0;
+      y_com_saber <= 0;
       x_com <= 50;
       y_com <= 50;
       w_com <= 0;
       h_com <= 0;
-    end else if(new_com)begin
-      x_com <= x_com_calc;
-      y_com <= y_com_calc;
-      w_com <= w_com_calc;
-      h_com <= h_com_calc;
+    end else begin
+      if (new_com) begin
+        x_com <= x_com_calc;
+        y_com <= y_com_calc;
+        w_com <= w_com_calc;
+        h_com <= h_com_calc;
+      end
+      if (new_com_saber) begin
+        x_com_saber <= x_com_calc_saber;
+        y_com_saber <= y_com_calc_saber;
+      end
     end
   end
 
@@ -451,37 +459,27 @@ module top_level(
   //0 cycle latency
   //TODO: Should be using output of (PS3)
   always_comb begin
-    if (hcount == x_com || vcount == y_com) begin
+    if (hcount == x_com_saber || vcount == y_com_saber) begin
       ch_red = 8'hF2;
       ch_green = 8'hF2;
       ch_blue = 8'hF2;
     end else begin
-    ch_red   = ((((hcount + w_com) >= (x_com << 1)) && hcount < (w_com)) &&
-                      (((vcount + h_com) >= (y_com << 1)) && vcount < (h_com)))?8'hFF:8'h00;
-    ch_green = ((((hcount + w_com) >= (x_com << 1)) && hcount < (w_com)) &&
-                      (((vcount + h_com) >= (y_com << 1)) && vcount < (h_com)))?8'hFF:8'h00;
-    ch_blue  = ((((hcount + w_com) >= (x_com << 1)) && hcount < (w_com)) &&
-                      (((vcount + h_com) >= (y_com << 1)) && vcount < (h_com)))?8'hFF:8'h00;
+      ch_red   = ((((hcount + w_com) >= (x_com << 1)) && hcount < (w_com)) &&
+                        (((vcount + h_com) >= (y_com << 1)) && vcount < (h_com)))?8'hFF:8'h00;
+      ch_green = ((((hcount + w_com) >= (x_com << 1)) && hcount < (w_com)) &&
+                        (((vcount + h_com) >= (y_com << 1)) && vcount < (h_com)))?8'hFF:8'h00;
+      ch_blue  = ((((hcount + w_com) >= (x_com << 1)) && hcount < (w_com)) &&
+                        (((vcount + h_com) >= (y_com << 1)) && vcount < (h_com)))?8'hFF:8'h00;
     end
   end
-
-
-  //Image Sprite (your implementation from early in Lab 5):
-  //Latency 4 cycle
-  image_sprite #(
-    .WIDTH(256),
-    .HEIGHT(256))
-    com_sprite_m (
-    .pixel_clk_in(clk_pixel),
-    .rst_in(sys_rst),
-    .hcount_in(hcount),   //(PS3 or None depending on choice)
-    .vcount_in(vcount),   //(PS3 or None depending on choice)
-    .x_in(x_com>128 ? x_com-128 : 0),
-    .y_in(y_com>128 ? y_com-128 : 0),
-    .red_out(img_red),
-    .green_out(img_green),
-    .blue_out(img_blue));
-
+  // ir_decoder irlol(.clk_in(clk_pixel), //clock in (74.25MHz)
+  //         .rst_in(reset), //reset in
+  //         .signal_in(signal), //signal in
+  //         output logic [31:0] code_out, //where to place 32 bit code once captured
+  //         output logic new_code_out, //single-cycle indicator that new code is present!
+  //         output logic [2:0] error_out, //output error codes for debugging
+  //         output logic [3:0] state_out //current state out (helpful for debugging)
+  //       );
 
   assign display_choice = sw[5:4];
   assign target_choice =  sw[7:6];
@@ -523,9 +521,9 @@ module top_level(
     .camera_pixel_in({r_in_pipe_1[3], g_in_pipe_1[3], b_in_pipe_1[3]}), //PS2
     .camera_y_in(y_pipe), //needs (PS6)
     .channel_in(selected_channel_pipe), //needs (PS5)
-    .thresholded_pixel_in(mask), //(PS4)
+    .thresholded_pixel_in(mask_shirt), //(PS4)
     .crosshair_in({ch_red_pipe[6], ch_green_pipe[6], ch_blue_pipe[6]}), // needs (PS8)
-    .com_sprite_pixel_in({img_red_pipe[2], img_green_pipe[2], img_blue_pipe[2]}), // needs (PS9) maybe?
+    .com_sprite_pixel_in(0), // needs (PS9) maybe?
     .pixel_out({red,green,blue}) //output to tmds
   );
 

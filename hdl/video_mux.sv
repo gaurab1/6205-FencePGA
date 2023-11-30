@@ -9,7 +9,7 @@ module video_mux (
   input wire [7:0] channel_in, //the channel from selection module
   input wire thresholded_pixel_in, //
   input wire [23:0] com_sprite_pixel_in,
-  input wire crosshair_in,
+  input wire [23:0] crosshair_in,
   output logic [23:0] pixel_out
 );
 

@@ -1,11 +1,11 @@
 `timescale 1ns / 1ps
 `default_nettype none
 module ir_decoder
-       #( parameter SBD  = 900_000, //sync burst duration
-          parameter SSD  = 450_000, //sync silence duration
-          parameter BBD = 60_000, //bit burst duration
-          parameter BSD0 = 60_000, //bit silence duration (for 0)
-          parameter BSD1 = 160_000, //bit silence duration (for 1)
+       #( parameter SBD  = 1_212_121, //sync burst duration
+          parameter SSD  = 606_060, //sync silence duration
+          parameter BBD = 80_808, //bit burst duration
+          parameter BSD0 = 80_808, //bit silence duration (for 0)
+          parameter BSD1 = 215_488, //bit silence duration (for 1)
           parameter MARGIN = 20_000 //The +/- of your signals
         )
         ( input wire clk_in, //clock in (100MHz)

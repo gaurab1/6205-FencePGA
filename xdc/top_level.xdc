@@ -129,9 +129,9 @@ set_property PACKAGE_PIN B13 [ get_ports "spkl"]
 set_property PACKAGE_PIN B14 [ get_ports "spkr"]
 set_property IOSTANDARD LVCMOS33 [ get_ports "spk*"]
 
-set_property PACKAGE_PIN E12 [ get_ports "mic_clk"]
-set_property PACKAGE_PIN D12 [ get_ports "mic_data"]
-set_property IOSTANDARD LVCMOS33 [ get_ports "mic*"]
+# set_property PACKAGE_PIN E12 [ get_ports "mic_clk"]
+# set_property PACKAGE_PIN D12 [ get_ports "mic_data"]
+# set_property IOSTANDARD LVCMOS33 [ get_ports "mic*"]
 
 #change G15 to B13 and E13 to B14
 #set_property PACKAGE_PIN B13 [ get_ports "spkl"]
