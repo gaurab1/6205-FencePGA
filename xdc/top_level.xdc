@@ -113,6 +113,13 @@ set_property -dict {PACKAGE_PIN G16 IOSTANDARD LVCMOS33}  [ get_ports "gpio[3]" 
 set_property -dict {PACKAGE_PIN C11 IOSTANDARD LVCMOS33}  [ get_ports "gpio[4]" ]
 set_property -dict {PACKAGE_PIN D10 IOSTANDARD LVCMOS33}  [ get_ports "gpio[5]" ]
 
+set_property -dict {PACKAGE_PIN D11 IOSTANDARD LVCMOS33}  [ get_ports "gpio[0]" ]
+set_property -dict {PACKAGE_PIN C12 IOSTANDARD LVCMOS33}  [ get_ports "gpio[1]" ]
+set_property -dict {PACKAGE_PIN E16 IOSTANDARD LVCMOS33}  [ get_ports "gpio[2]" ]
+set_property -dict {PACKAGE_PIN G16 IOSTANDARD LVCMOS33}  [ get_ports "gpio[3]" ]
+set_property -dict {PACKAGE_PIN C11 IOSTANDARD LVCMOS33}  [ get_ports "gpio[4]" ]
+set_property -dict {PACKAGE_PIN D10 IOSTANDARD LVCMOS33}  [ get_ports "gpio[5]" ]
+
 #HDMI Signals
 set_property -dict { PACKAGE_PIN V17   IOSTANDARD TMDS_33  } [get_ports {hdmi_clk_n}]
 set_property -dict { PACKAGE_PIN U16   IOSTANDARD TMDS_33  } [get_ports {hdmi_clk_p}]
