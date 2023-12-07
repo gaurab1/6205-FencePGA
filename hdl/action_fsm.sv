@@ -38,9 +38,6 @@ module action_fsm(
   logic attack_intersecting;
 
   intersection_detector int_inst(
-    .clk_pixel_in(clk_pixel_in),
-    .rst_in(rst_in),
-    .is_attacking(in_attack),
     .saber_start_x(player_data.saber_start_x),
     .saber_start_y(player_data.saber_start_y),
     .saber_current_x(player_data.location.saber_x),
@@ -88,9 +85,9 @@ module action_fsm(
         end
         ATTACK: begin
           in_attack <= 1'b1;
-          if (attack_intersecting) begin
+          if (lunge_in == 0 && attack_intersecting) begin
             state <= SCORE;
-          end else if (sabers_colliding) begin
+          end else if (sabers_colliding || lunge_in == 0) begin
             state <= RECOVER;
           end
         end
