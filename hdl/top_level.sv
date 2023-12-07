@@ -95,6 +95,10 @@ module top_level(
   logic mask_shirt; //Whether or not thresholded pixel is 1 or 0
   logic mask_saber;
 
+  // ir output
+  logic [31:0] ir_out;
+  logic [2:0] error_out;
+  logic [3:0] state_out;
 
   //Center of Mass variables (tally all mask=1 pixels for a frame and calculate their center of mass)
   logic [11:0] x_com, x_com_calc, w_com, w_com_calc, x_com_calc_saber, x_com_saber; //long term x_com and output from module, resp
@@ -128,7 +132,7 @@ module top_level(
     pixel_in <= pixel_buff;
   end
 
-  //clock manager...creates 74.25 Hz and 5 times 74.25 MHz for pixel and TMDS,respectively
+  //clock manager...creates 74.25 MHz and 5 times 74.25 MHz for pixel and TMDS,respectively
   hdmi_clk_wiz_720p mhdmicw (
       .clk_pixel(clk_pixel),
       .clk_tmds(clk_5x),
@@ -203,7 +207,7 @@ module top_level(
     .RAM_WIDTH(16), //each entry in this memory is 16 bits
     .RAM_DEPTH(320*240)) //there are 240*320 or 76800 entries for full frame
     frame_buffer (
-    .addra(hcount_rec + 320*vcount_rec), //pixels are stored using this math
+    .addra(hcount_rec + 320*(240 - vcount_rec)), //pixels are stored using this math
     .clka(clk_pixel),
     .wea(data_valid_rec),
     .dina(pixel_data_rec),
@@ -341,7 +345,7 @@ module top_level(
   threshold(
      .clk_in(clk_pixel),
      .rst_in(sys_rst),
-     .pixel_in(cr),
+     .pixel_in(selected_channel),
      .lower_bound_in(lower_threshold),             // 8'b00010000
      .upper_bound_in(upper_threshold),             // 8'b01111000
      .mask_out(mask_shirt) //single bit if pixel within mask.
@@ -350,22 +354,27 @@ module top_level(
   threshold(
      .clk_in(clk_pixel),
      .rst_in(sys_rst),
-     .pixel_in(b_in_pipe[2]),
-     .lower_bound_in(8'b00110010),
-     .upper_bound_in(8'b01110000),
+     .pixel_in(cb),
+     .lower_bound_in(8'b00001110),
+     .upper_bound_in(8'b00100000),
      .mask_out(mask_saber) //single bit if pixel within mask.
   );
 
   //modified version of seven segment display for showing
   // thresholds and selected channel
-  lab05_ssc mssc(.clk_in(clk_pixel),
-                 .rst_in(sys_rst),
-                 .lt_in(lower_threshold),
-                 .ut_in(upper_threshold),
-                 .channel_sel_in(channel_sel),
-                 .cat_out(ss_c),
-                 .an_out({ss0_an, ss1_an})
-  );
+  // lab05_ssc mssc(.clk_in(clk_pixel),
+  //                .rst_in(sys_rst),
+  //                .lt_in(lower_threshold),
+  //                .ut_in(upper_threshold),
+  //                .channel_sel_in(channel_sel),
+  //                .cat_out(ss_c),
+  //                .an_out({ss0_an, ss1_an})
+  // );
+  seven_segment_controller(.clk_in(clk_pixel),
+                           .rst_in(sys_rst),
+                           .val_in(ir_out),
+                           .cat_out(ss_c),
+                           .an_out({ss0_an, ss1_an}));
   assign ss0_c = ss_c; //control upper four digit's cathodes!
   assign ss1_c = ss_c; //same as above but for lower four digits!
 
@@ -430,7 +439,7 @@ module top_level(
     .valid_out(new_com)
   );
 
-  
+
   //grab logic for above
   //update center of mass x_com, y_com based on new_com signal
   always_ff @(posedge clk_pixel)begin
@@ -472,14 +481,14 @@ module top_level(
                         (((vcount + h_com) >= (y_com << 1)) && vcount < (h_com)))?8'hFF:8'h00;
     end
   end
-  // ir_decoder irlol(.clk_in(clk_pixel), //clock in (74.25MHz)
-  //         .rst_in(reset), //reset in
-  //         .signal_in(signal), //signal in
-  //         output logic [31:0] code_out, //where to place 32 bit code once captured
-  //         output logic new_code_out, //single-cycle indicator that new code is present!
-  //         output logic [2:0] error_out, //output error codes for debugging
-  //         output logic [3:0] state_out //current state out (helpful for debugging)
-  //       );
+
+  ir_fsm irlol(.clk_in(clk_pixel), //clock in (74.25MHz)
+          .rst_in(sys_rst), //reset in
+          .ir_signal(pmodb[7]), //signal in
+          .code_out(ir_out),
+          .error_out(error_out), //output error codes for debugging
+          .state_out(state_out)
+        );
 
   assign display_choice = sw[5:4];
   assign target_choice =  sw[7:6];
@@ -515,16 +524,35 @@ module top_level(
 
   
 
-  video_mux (
-    .bg_in(display_choice), //choose background
-    .target_in(target_choice), //choose target
-    .camera_pixel_in({r_in_pipe_1[3], g_in_pipe_1[3], b_in_pipe_1[3]}), //PS2
-    .camera_y_in(y_pipe), //needs (PS6)
-    .channel_in(selected_channel_pipe), //needs (PS5)
-    .thresholded_pixel_in(mask_shirt), //(PS4)
-    .crosshair_in({ch_red_pipe[6], ch_green_pipe[6], ch_blue_pipe[6]}), // needs (PS8)
-    .com_sprite_pixel_in(0), // needs (PS9) maybe?
-    .pixel_out({red,green,blue}) //output to tmds
+  // video_mux (
+  //   .bg_in(display_choice), //choose background
+  //   .target_in(target_choice), //choose target
+  //   .camera_pixel_in({r_in_pipe_1[3], g_in_pipe_1[3], b_in_pipe_1[3]}), //PS2
+  //   .camera_y_in(y_pipe), //needs (PS6)
+  //   .channel_in(selected_channel_pipe), //needs (PS5)
+  //   .thresholded_pixel_in(mask_shirt), //(PS4)
+  //   .crosshair_in({ch_red_pipe[6], ch_green_pipe[6], ch_blue_pipe[6]}), // needs (PS8)
+  //   .com_sprite_pixel_in(0), // needs (PS9) maybe?
+  //   .pixel_out({red,green,blue}) //output to tmds
+  // );
+
+  display_module plswork (
+    .hcount_in(h_count_pipe[6]),
+    .vcount_in(v_count_pipe[6]),
+    .nf_in(new_frame_pipe[6]),
+    .player_box_x_in(x_com),
+    .player_box_y_in(y_com),
+    .player_box_xmax_in(w_com),
+    .player_box_ymax_in(h_com),
+    .player_saber_x_in(x_com_saber),
+    .player_saber_y_in(y_com_saber),
+    .opponent_box_x_in(20),
+    .opponent_box_y_in(20),
+    .opponent_box_xmax_in(30),
+    .opponent_box_ymax_in(30),
+    .opponent_saber_x_in(0),
+    .opponent_saber_y_in(0),
+    .pixel_out({red, green, blue})
   );
 
   //TODO: Appropriate signals below need to use outputs from PS7

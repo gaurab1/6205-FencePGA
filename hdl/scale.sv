@@ -15,9 +15,12 @@ module scale(
       scaled_hcount_out = hcount_in;
       scaled_vcount_out = vcount_in;
     end else if (scale_in == 2) begin
-      valid_addr_out = hcount_in <960 && vcount_in <640;
+      valid_addr_out = hcount_in < 960  && vcount_in <640;
       scaled_hcount_out = hcount_in>>2;
       scaled_vcount_out = vcount_in>>1;
+      // valid_addr_out = (hcount_in < 1120 && hcount_in >= 160) && (vcount_in < 680 && vcount_in >= 40);
+      // scaled_hcount_out = (hcount_in>>2) + 160;
+      // scaled_vcount_out = (vcount_in>>1) + 40;
     end else if (scale_in == 3) begin
       valid_addr_out = hcount_in <480 && vcount_in <640;
       scaled_hcount_out = hcount_in>>1;

@@ -5,7 +5,8 @@ module ir_fsm(
     input wire rst_in,
     input wire ir_signal,
     output logic [31:0] code_out,
-    output logic [2:0] error_out
+    output logic [2:0] error_out,
+    output logic [2:0] state_out
 );
 
   logic ir_signal_clean; //synchronize incoming infrared to avoid bugs from setup/hold violations
@@ -19,7 +20,6 @@ module ir_fsm(
   //infrared decoder
   logic [31:0] code;
   logic [2:0] error;
-  logic [3:0] ir_state;
   logic [2:0] locked_error;
   logic new_code;
 
@@ -27,7 +27,7 @@ module ir_fsm(
                     .rst_in(rst_in),
                     .signal_in(ir_signal_clean),
                     .code_out(code),
-                    .state_out(ir_state),
+                    .state_out(state_out),
                     .error_out(error),
                     .new_code_out(new_code));
 

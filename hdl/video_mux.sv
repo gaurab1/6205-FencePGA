@@ -15,7 +15,7 @@ module video_mux (
 
   /*
   00: normal camera out
-  01: channel image (in grayscale)
+  01: channel image (in grayscale)3333333333333333333333333333333333333333333333
   10: (thresholded channel image b/w)
   11: y channel with magenta mask
 
@@ -40,7 +40,7 @@ module video_mux (
   always_comb begin
     case (target_in)
       2'b00: l_2 = l_1;
-      2'b01: l_2 = crosshair_in? 24'h00FF00:l_1;
+      2'b01: l_2 = crosshair_in? crosshair_in:l_1;
       2'b10: l_2 = (com_sprite_pixel_in >0)?com_sprite_pixel_in:l_1;
       2'b11: l_2 = 24'hFF7700; //test color
     endcase
