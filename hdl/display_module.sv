@@ -2,6 +2,8 @@
 `default_nettype none // prevents system from inferring an undeclared logic (good practice)
 
 module display_module (
+  input wire clk_in,
+  input wire rst_in,
   input wire [10:0] hcount_in,
   input wire [9:0] vcount_in,
   input wire nf_in,
@@ -34,15 +36,25 @@ module display_module (
     .green_out(player_box[15:8]),
     .blue_out(player_box[7:0]));
 
-  fixed_block_sprite playersaber(
-    .hcount_in(hcount_in),
-    .vcount_in(vcount_in),
-    .x_in(player_saber_x_in),
-    .y_in(player_saber_y_in),
-    .red_out(player_saber[23:16]),
-    .green_out(player_saber[15:8]),
-    .blue_out(player_saber[7:0])
-  );
+//   fixed_block_sprite playersaber(
+//     .hcount_in(hcount_in),
+//     .vcount_in(vcount_in),
+//     .x_in(player_saber_x_in),
+//     .y_in(player_saber_y_in),
+//     .red_out(player_saber[23:16]),
+//     .green_out(player_saber[15:8]),
+//     .blue_out(player_saber[7:0])
+//   );
+
+  trace_display playersaber(
+  .clk_in(clk_in),
+  .rst_in(rst_in),
+  .nf_in(nf_in),
+  .hcount_in(hcount_in),
+  .vcount_in(vcount_in),
+  .x_in(player_saber_x_in),
+  .y_in(player_saber_y_in),
+  .color_out(player_saber));
 
   fixed_block_sprite opponentsaber(
     .hcount_in(hcount_in),

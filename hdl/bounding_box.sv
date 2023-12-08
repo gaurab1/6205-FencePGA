@@ -47,13 +47,13 @@ module bounding_box (
             y_out <= y_com_calc;
             valid_out <= 0;
         end else if (find_dims) begin
-            if (hcount_in == x_out && vcount_in > y_out && vcount_in < 720 && (vcount_in <= {y_out, 1'b0}) && (data_y_out == 0)) begin
+            if (hcount_in == x_out && vcount_in > y_out && vcount_in < 720 && (data_y_out == 0)) begin
                 y_threshold <= (y_threshold > 0 && (valid_in == 0)) ? y_threshold - 1: y_threshold;
                 if (y_threshold == 0 || vcount_in >= V_PIXELS) begin
                     h_out <= vcount_in;
                     data_y_out <= 1;
                 end
-            end else if (vcount_in == y_out && hcount_in > x_out && (hcount_in <= {y_out, 1'b0}) && (data_x_out == 0)) begin
+            end else if (vcount_in == y_out && hcount_in > x_out && (data_x_out == 0)) begin
                 x_threshold <= (x_threshold > 0 && (valid_in == 0)) ? x_threshold - 1: x_threshold;
                 if (x_threshold == 0 || hcount_in >= H_PIXELS) begin
                     w_out <= hcount_in;

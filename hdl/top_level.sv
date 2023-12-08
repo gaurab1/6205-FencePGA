@@ -529,6 +529,8 @@ module top_level(
   // );
 
   display_module plswork (
+    .clk_in(clk_pixel),
+    .rst_in(sys_rst),
     .hcount_in(h_count_pipe[6]),
     .vcount_in(v_count_pipe[6]),
     .nf_in(new_frame_pipe[6]),

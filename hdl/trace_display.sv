@@ -57,9 +57,36 @@ module trace_display (
     .vcount_in(vcount_in),
     .x_in(prev_hcounts[3]),
     .y_in(prev_vcounts[3]),
-    .red_out(color[3][23:16]),
-    .green_out(color[3][15:8]),
-    .blue_out(color[3][7:0])
+    .red_out(color[4][23:16]),
+    .green_out(color[4][15:8]),
+    .blue_out(color[4][7:0])
   );
+
+  assign color_out = color[0] ? color[0] : color[1] ? color[1] : color[2] ? color[2] : color[3] ? color[3] : color[4] ? color[4] : 0;
+  always_ff @(posedge clk_in) begin
+    if (rst_in) begin
+        prev_hcounts[0] <= 0;
+        prev_hcounts[1] <= 0;
+        prev_hcounts[2] <= 0;
+        prev_hcounts[3] <= 0;
+        prev_hcounts[4] <= 0;
+
+        prev_vcounts[0] <= 0;
+        prev_vcounts[1] <= 0;
+        prev_vcounts[2] <= 0;
+        prev_vcounts[3] <= 0;
+        prev_vcounts[4] <= 0;
+    end else begin
+        if (nf_in) begin
+            prev_hcounts[0] <= x_in;
+            prev_vcounts[0] <= y_in;
+            for (int i=1; i<5; i = i+1)begin
+                prev_hcounts[i] <= prev_hcounts[i-1];
+                prev_vcounts[i] <= prev_vcounts[i-1];
+            end
+        end
+    end
+
+  end
 
 endmodule
