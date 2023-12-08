@@ -10,6 +10,7 @@ module transmitter_tb();
 
   // inputs from previous state of fsm
   data_t old_player_data_in;
+  logic player_scored_in;
   logic old_player_data_in_valid;
 
   // inputs from bounding box module
@@ -25,6 +26,7 @@ module transmitter_tb();
     .clk_pixel_in(clk_in),
     .rst_in(rst_in),
     .old_player_data_in(old_player_data_in),
+    .player_scored_in(player_scored_in),
     .old_player_data_in_valid(old_player_data_in_valid),
     .location_in(location_in),
     .location_in_valid(location_in_valid),
@@ -47,6 +49,7 @@ module transmitter_tb();
     clk_in = 0;
     rst_in = 0;
     old_player_data_in_valid = 0;
+    player_scored_in = 0;
     #10;
     rst_in = 1;
     #10;
@@ -71,12 +74,14 @@ module transmitter_tb();
     #100;
     old_player_data_in = 89'b111_10010100001_1110101010_11111011111_0111010101_10101110101_0101010101_00_10101010101_0101010101;
     old_player_data_in_valid = 1'b1;
+    player_scored_in = 1'b1;
     #10;
     old_player_data_in_valid = 0;
     #100000;
 
     old_player_data_in = 89'b100_10010100001_1110101010_11111011111_0111010101_10101110101_0101010101_00_10101010101_0101010101;
     old_player_data_in_valid = 1'b1;
+    player_scored_in = 0;
     #10;
     old_player_data_in_valid = 0;
     #1000;

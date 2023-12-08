@@ -18,6 +18,7 @@ module attack_logic (
   parameter LUNGE_CODE = 32'h20FACADE;
 
   data_t fsm_player_data;
+  logic player_scored;
   logic fsm_player_data_valid;
 
   location_t player_location;
@@ -27,6 +28,7 @@ module attack_logic (
     .clk_pixel_in(clk_pixel_in),
     .rst_in(rst_in),
     .old_player_data_in(fsm_player_data),
+    .player_scored_in(player_scored),
     .old_player_data_in_valid(fsm_player_data_valid),
     .location_in(location_in),
     .location_in_valid(location_in_valid),
@@ -38,8 +40,10 @@ module attack_logic (
   );
   
   data_t opponent_data;
+  logic opponent_scored;
   logic syncer_data_valid;
   location_t syncer_player_location;
+
 
   syncer syncer_inst(
     .clk_pixel_in(clk_pixel_in),
@@ -51,6 +55,7 @@ module attack_logic (
     .sel_in(pmod_in[2]),
     .player_location_out(syncer_player_location),
     .opponent_data_out(opponent_data),
+    .opponent_scored_out(opponent_scored),
     .data_out_valid(syncer_data_valid)
   );
 
@@ -62,8 +67,10 @@ module attack_logic (
     .ir_valid_in(decoded_ir_in_valid),
     .player_location_in(syncer_player_location),
     .opponent_data_in(opponent_data),
+    .opponent_scored_in(opponent_scored),
     .syncer_data_in_valid(syncer_data_valid),
     .player_data_out(fsm_player_data),
+    .player_scored_out(player_scored),
     .opponent_data_out(opponent_data_out),
     .data_out_valid(fsm_player_data_valid)
   );

@@ -8,7 +8,7 @@ module syncer_tb();
   logic clk_in;
   logic rst_in;
 
-  logic [88:0] data_to_send;
+  logic [89:0] data_to_send;
 
   // inputs from outside
   logic data_in, data_clk_in, sel_in;
@@ -20,6 +20,7 @@ module syncer_tb();
   // outputs to print
   location_t syncer_player_location;
   data_t opponent_data;
+  logic opponent_scored;
   logic syncer_data_valid;
 
   // SPI_RX.
@@ -33,6 +34,7 @@ module syncer_tb();
     .sel_in(sel_in),
     .player_location_out(syncer_player_location),
     .opponent_data_out(opponent_data),
+    .opponent_scored_out(opponent_scored),
     .data_out_valid(syncer_data_valid)
   );
 
@@ -55,10 +57,10 @@ module syncer_tb();
     #10;
     sel_in = 0;
     player_location_valid = 0;
-    data_to_send = 89'b101_00000100001_1010101010_11111011111_0101010101_10101010101_0101010101_00_10101010101_0101010101;
-    for (int i = 0; i < $bits(data_t); i=i+1) begin
+    data_to_send = 90'b101_00000100001_1010101010_11111011111_0101010101_10101010101_0101010101_00_10101010101_0101010101_0;
+    for (int i = 0; i < $bits(data_t)+1; i=i+1) begin
       data_clk_in = 0;
-      data_in = data_to_send[$bits(data_t)-1-i];
+      data_in = data_to_send[$bits(data_t)-i];
       #500;
       if (i == 15) begin
         data_clk_in = 1;
@@ -87,10 +89,10 @@ module syncer_tb();
     #10;
     sel_in = 0;
     player_location_valid = 0;
-    data_to_send = 89'b101_00011101101_1010101010_11111011111_0101010101_10101010101_0101010101_00_10101010101_0101010101;
-    for (int i = 0; i < $bits(data_t); i=i+1) begin
+    data_to_send = 90'b101_00011101101_1010101010_11111011111_0101010101_10101010101_0101010101_00_10101010101_0101010101_0;
+    for (int i = 0; i < $bits(data_t)+1; i=i+1) begin
       data_clk_in = 0;
-      data_in = data_to_send[$bits(data_t)-1-i];
+      data_in = data_to_send[$bits(data_t)-i];
       #500;
       data_clk_in = 1;
       #500;
@@ -106,10 +108,10 @@ module syncer_tb();
     #10;
     sel_in = 0;
     player_location_valid = 0;
-    data_to_send = 89'b101_00000100001_1010101010_11111011011_0111011101_10101010101_0101010101_00_10101010101_0101010101;
-    for (int i = 0; i < $bits(data_t); i=i+1) begin
+    data_to_send = 90'b101_00000100001_1010101010_11111011011_0111011101_10101010101_0101010101_00_10101010101_0101010101_1;
+    for (int i = 0; i < $bits(data_t)+1; i=i+1) begin
       data_clk_in = 0;
-      data_in = data_to_send[$bits(data_t)-1-i];
+      data_in = data_to_send[$bits(data_t)-i];
       #500;
       data_clk_in = 1;
       #500;
@@ -119,7 +121,7 @@ module syncer_tb();
     player_location_valid = 1'b1;
     player_location = 63'b01010101011_1111111010_11100011111_0101011101_10101010101_0101010101;
 
-    #100;
+    #10000;
 
     $display("Finishing Sim"); //print nice message at end
     $finish;

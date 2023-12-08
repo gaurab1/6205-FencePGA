@@ -11,6 +11,7 @@ module syncer(
     input wire data_clk_in,
     input wire sel_in,
     output location_t player_location_out,
+    output logic opponent_scored_out,
     output data_t opponent_data_out,
     output logic data_out_valid
   );
@@ -18,18 +19,19 @@ module syncer(
   logic player_location_received;
   logic opponent_data_received;
   location_t player_location;
+  logic opponent_scored;
   data_t opponent_data;
   logic opponent_data_valid;
 
   spi_rx #(
-    .DATA_WIDTH($bits(data_t))
+    .DATA_WIDTH($bits(data_t)+1)
   ) spi_rx_inst ( 
     .clk_in(clk_pixel_in),
     .rst_in(rst_in),
     .data_in(data_in),
     .data_clk_in(data_clk_in),
     .sel_in(sel_in),
-    .data_out(opponent_data),
+    .data_out({opponent_data, opponent_scored}),
     .new_data_out(opponent_data_valid)
   );
 
@@ -44,6 +46,7 @@ module syncer(
         data_out_valid <= 1'b1;
         player_location_out <= player_location;
         opponent_data_out <= opponent_data;
+        opponent_scored_out <= opponent_scored;
         player_location_received <= 0;
         opponent_data_received <= 0;
       end else if (player_location_received) begin
