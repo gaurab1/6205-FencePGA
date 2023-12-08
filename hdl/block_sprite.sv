@@ -26,7 +26,7 @@ module block_sprite #(COLOR=24'hFF_00_00)(
 endmodule
 
 module fixed_block_sprite #(
-  parameter WIDTH=3, HEIGHT=3, COLOR=24'hFF_FF_FF)(
+  parameter WIDTH=15, HEIGHT=15, COLOR=24'hFF_FF_FF)(
   input wire [10:0] hcount_in,
   input wire [9:0] vcount_in,
   input wire [10:0] x_in,

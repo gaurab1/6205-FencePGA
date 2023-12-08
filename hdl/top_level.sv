@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 `default_nettype none
-
+`include "types.svh"
 module top_level(
   input wire clk_100mhz,
   input wire [15:0] sw, //all 16 input slide switches
@@ -32,15 +32,6 @@ module top_level(
 
   //variable for seven-segment module
   logic [6:0] ss_c;
-
-  typedef struct packed {
-  logic [10:0] rect_x;
-  logic [9:0] rect_y;
-  logic [10:0] rect_x_2;
-  logic [9:0] rect_y_2;
-  logic [10:0] saber_x;
-  logic [9:0] saber_y;
-} location_t;
 
   //Clocking Variables:
   logic clk_pixel, clk_5x; //clock lines (pixel clock and 1/2 tmds clock)
