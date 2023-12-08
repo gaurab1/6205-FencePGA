@@ -495,7 +495,17 @@ module top_level(
           .new_code(code_out)
         );
 
-  data_t player_data, opponent_data, attack_data_valid;
+  data_t player_data, opponent_data;
+  logic attack_data_valid;
+
+  data_t player_data_sync, opponent_data_sync;
+
+  always_ff @(posedge clk_pixel) begin
+    if (attack_data_valid) begin
+      player_data_sync <= player_data;
+      opponent_data_sync <= opponent_data;
+    end
+  end
 
   attack_logic attaaaack (
     .clk_pixel_in(clk_pixel),
@@ -552,18 +562,18 @@ module top_level(
     .hcount_in(h_count_pipe[6]),
     .vcount_in(v_count_pipe[6]),
     .nf_in(new_frame_pipe[6]),
-    .player_box_x_in(x_com),
-    .player_box_y_in(y_com),
-    .player_box_xmax_in(w_com),
-    .player_box_ymax_in(h_com),
-    .player_saber_x_in(x_com_saber),
-    .player_saber_y_in(y_com_saber),
-    .opponent_box_x_in(20),
-    .opponent_box_y_in(20),
-    .opponent_box_xmax_in(50),
-    .opponent_box_ymax_in(50),
-    .opponent_saber_x_in(158),
-    .opponent_saber_y_in(190),
+    .player_box_x_in(((player_data_sync.location.rect_x_2 + player_data_sync.location.rect_x) >> 1)),
+    .player_box_y_in(((player_data_sync.location.rect_y_2 + player_data_sync.location.rect_y) >> 1)),
+    .player_box_xmax_in(player_data_sync.location.rect_x_2),
+    .player_box_ymax_in(player_data_sync.location.rect_y_2),
+    .player_saber_x_in(player_data_sync.location.saber_x),
+    .player_saber_y_in(player_data_sync.location.saber_y),
+    .opponent_box_x_in(((opponent_data_sync.location.rect_x_2 + opponent_data_sync.location.rect_x) >> 1)),
+    .opponent_box_y_in(((opponent_data_sync.location.rect_y_2 + opponent_data_sync.location.rect_y) >> 1)),
+    .opponent_box_xmax_in(opponent_data_sync.location.rect_x_2),
+    .opponent_box_ymax_in(opponent_data_sync.location.rect_x_2),
+    .opponent_saber_x_in(opponent_data_sync.location.saber_x),
+    .opponent_saber_y_in(opponent_data_sync.location.saber_x),
     .pixel_out({red, green, blue})
   );
 

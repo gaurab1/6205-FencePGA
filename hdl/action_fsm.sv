@@ -10,7 +10,7 @@ module action_fsm(
     input wire ir_in_valid,
     input location_t player_location_in,
     input data_t opponent_data_in,
-    input logic opponent_scored_in,
+    input wire opponent_scored_in,
     input wire syncer_in_valid,
     output data_t player_data_out,
     output logic player_scored_out,
