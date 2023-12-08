@@ -23,7 +23,7 @@ module spi_tx
 	logic [COUNTER_SIZE-1:0] ans = ACTUAL_PERIOD;	
 	always_ff @(posedge clk_in) begin
 		if (rst_in == 1) begin
-			sel_out = 1;
+			sel_out <= 1;
 		end else begin
 			if (trigger_in == 1 && sel_out == 1) begin
 				sel_out <= 0;
