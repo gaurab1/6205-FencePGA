@@ -492,8 +492,24 @@ module top_level(
           .code_out(ir_out),
           .error_out(error_out), //output error codes for debugging
           .state_out(state_out),
-          .code_out(code_out)
+          .new_code(code_out)
         );
+
+  data_t player_data, opponent_data, attack_data_valid;
+
+  attack_logic attaaaack (
+    .clk_pixel_in(clk_pixel),
+    .rst_in(sys_rst),
+    .decoded_ir_in(ir_out),
+    .decoded_ir_in_valid(code_out),
+    .location_in(location_player),
+    .location_in_valid(new_com),
+    .pmod_in(gpio[2:0]),
+    .pmod_out(gpio[5:3]),
+    .player_data_out(player_data),
+    .opponent_data_out(opponent_data),
+    .data_out_valid(attack_data_valid)
+  );
 
   assign display_choice = sw[5:4];
   assign target_choice =  sw[7:6];
