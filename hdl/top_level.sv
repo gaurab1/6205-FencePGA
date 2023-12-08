@@ -99,6 +99,7 @@ module top_level(
   logic [31:0] ir_out;
   logic [2:0] error_out;
   logic [3:0] state_out;
+  logic code_out;
 
   //Center of Mass variables (tally all mask=1 pixels for a frame and calculate their center of mass)
   logic [11:0] x_com, x_com_calc, w_com, w_com_calc, x_com_calc_saber, x_com_saber; //long term x_com and output from module, resp
@@ -490,7 +491,8 @@ module top_level(
           .ir_signal(pmodb[7]), //signal in
           .code_out(ir_out),
           .error_out(error_out), //output error codes for debugging
-          .state_out(state_out)
+          .state_out(state_out),
+          .code_out(code_out)
         );
 
   assign display_choice = sw[5:4];
