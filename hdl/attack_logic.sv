@@ -44,15 +44,37 @@ module attack_logic (
   logic syncer_data_valid;
   location_t syncer_player_location;
 
+  logic data_line, data_clk, select;
+
+  synchronizer s1( 
+    .clk_in(clk_pixel_in),
+    .rst_in(sys_rst),
+    .us_in(pmod_in[0]),
+    .s_out(data_line)
+  );
+ 
+  synchronizer s2( 
+    .clk_in(clk_pixel_in),
+    .rst_in(sys_rst),
+    .us_in(pmod_in[1]),
+    .s_out(data_clk)
+  );
+ 
+  synchronizer s3( 
+    .clk_in(clk_pixel_in),
+    .rst_in(sys_rst),
+    .us_in(pmod_in[2]),
+    .s_out(select)
+  );
 
   syncer syncer_inst(
     .clk_pixel_in(clk_pixel_in),
     .rst_in(rst_in),
     .location_in(player_location),
     .location_in_valid(player_location_valid),
-    .data_in(pmod_in[0]),
-    .data_clk_in(pmod_in[1]),
-    .sel_in(pmod_in[2]),
+    .data_in(data_line),
+    .data_clk_in(data_clk),
+    .sel_in(select),
     .player_location_out(syncer_player_location),
     .opponent_data_out(opponent_data),
     .opponent_scored_out(opponent_scored),
