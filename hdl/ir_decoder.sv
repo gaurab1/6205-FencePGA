@@ -1,13 +1,6 @@
 `timescale 1ns / 1ps
 `default_nettype none
 module ir_decoder
-      //  #( parameter SBD  = 668_250, //sync burst duration
-      //     parameter SSD  = 606_060, //sync silence duration
-      //     parameter BBD = 80_808, //bit burst duration
-      //     parameter BSD0 = 80_808, //bit silence duration (for 0)
-      //     parameter BSD1 = 215_488, //bit silence duration (for 1)
-      //     parameter MARGIN = 30_000 //The +/- of your signals
-      //   )
       #( parameter SBD  = int'(900_000*0.7425), //sync burst duration
           parameter SSD  = int'(450_000*0.7425), //sync silence duration
           parameter BBD = int'(60_000*0.7425), //bit burst duration

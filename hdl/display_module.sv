@@ -34,6 +34,26 @@ module display_module (
     .green_out(player_box[15:8]),
     .blue_out(player_box[7:0]));
 
+  fixed_block_sprite playersaber(
+    .hcount_in(hcount_in),
+    .vcount_in(vcount_in),
+    .x_in(player_saber_x_in),
+    .y_in(player_saber_y_in),
+    .red_out(player_saber[23:16]),
+    .green_out(player_saber[15:8]),
+    .blue_out(player_saber[7:0])
+  );
+
+  fixed_block_sprite opponentsaber(
+    .hcount_in(hcount_in),
+    .vcount_in(vcount_in),
+    .x_in(opponent_saber_x_in),
+    .y_in(opponent_saber_y_in),
+    .red_out(opponent_saber[23:16]),
+    .green_out(opponent_saber[15:8]),
+    .blue_out(opponent_saber[7:0])
+  );
+
   block_sprite opp(
     .hcount_in(hcount_in),
     .vcount_in(vcount_in),
@@ -49,8 +69,8 @@ module display_module (
     .game_border_in(border),
     .player_box_in(player_box),
     .opponent_box_in(opponent_box),
-    .player_saber_in(0),
-    .opponent_saber_in(0),
+    .player_saber_in(player_saber),
+    .opponent_saber_in(opponent_saber),
     .pixel_out(pixel_out)
   );
 

@@ -33,6 +33,15 @@ module top_level(
   //variable for seven-segment module
   logic [6:0] ss_c;
 
+  typedef struct packed {
+  logic [10:0] rect_x;
+  logic [9:0] rect_y;
+  logic [10:0] rect_x_2;
+  logic [9:0] rect_y_2;
+  logic [10:0] saber_x;
+  logic [9:0] saber_y;
+} location_t;
+
   //Clocking Variables:
   logic clk_pixel, clk_5x; //clock lines (pixel clock and 1/2 tmds clock)
   logic locked; //locked signal (we'll leave unused but still hook it up)
@@ -108,6 +117,7 @@ module top_level(
   //crosshair output:
   logic [7:0] ch_red, ch_green, ch_blue;
 
+  location_t location_player;
 
   //used with switches for display selections
   logic [1:0] display_choice;
@@ -293,6 +303,7 @@ module top_level(
     .cb_out(cb_full)
   );
 
+  
   //take lower 8 of full outputs
   assign y = y_full[7:0];
   assign cr = cr_full[7:0];
@@ -464,6 +475,7 @@ module top_level(
     end
   end
 
+  assign location_player = {(x_com << 1) - w_com, (y_com << 1) - h_com, w_com, h_com, x_com_saber, y_com_saber};
   //Create Crosshair patter on center of mass:
   //0 cycle latency
   //TODO: Should be using output of (PS3)
@@ -493,17 +505,6 @@ module top_level(
   assign display_choice = sw[5:4];
   assign target_choice =  sw[7:6];
 
-  //choose what to display from the camera:
-  // * 'b00:  normal camera out
-  // * 'b01:  selected channel image in grayscale
-  // * 'b10:  masked pixel (all on if 1, all off if 0)
-  // * 'b11:  chroma channel with mask overtop as magenta
-  //
-  //then choose what to use with center of mass:
-  // * 'b00: nothing
-  // * 'b01: crosshair
-  // * 'b10: sprite on top
-  // * 'b11: nothing
   logic [7:0] r_in_pipe_1 [3:0];
   logic [7:0] g_in_pipe_1 [3:0];
   logic [7:0] b_in_pipe_1 [3:0];
@@ -548,14 +549,12 @@ module top_level(
     .player_saber_y_in(y_com_saber),
     .opponent_box_x_in(20),
     .opponent_box_y_in(20),
-    .opponent_box_xmax_in(30),
-    .opponent_box_ymax_in(30),
-    .opponent_saber_x_in(0),
-    .opponent_saber_y_in(0),
+    .opponent_box_xmax_in(50),
+    .opponent_box_ymax_in(50),
+    .opponent_saber_x_in(158),
+    .opponent_saber_y_in(190),
     .pixel_out({red, green, blue})
   );
-
-  //TODO: Appropriate signals below need to use outputs from PS7
 
   //three tmds_encoders (blue, green, red)
   tmds_encoder tmds_red(

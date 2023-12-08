@@ -10,7 +10,7 @@ module display_module_mux (
   output logic [23:0] pixel_out
 );
  // assign pixel_out = 24'hFFFFFF;
- assign pixel_out = game_border_in ? 24'hFFFFFF: (player_box_in != 0) ? player_box_in : opponent_box_in;
+ assign pixel_out = game_border_in ? 24'hFFFFFF: player_saber_in ? player_saber_in : opponent_saber_in ? opponent_saber_in : (player_box_in != 0) ? player_box_in : opponent_box_in;
 endmodule
 
 `default_nettype wire
