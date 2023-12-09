@@ -104,7 +104,7 @@ module top_level(
   //Center of Mass variables (tally all mask=1 pixels for a frame and calculate their center of mass)
   logic [11:0] x_com, x_com_calc, w_com, w_com_calc, x_com_calc_saber, x_com_saber; //long term x_com and output from module, resp
   logic [10:0] y_com, y_com_calc, h_com, h_com_calc, y_com_calc_saber, y_com_saber; //long term y_com and output from module, resp
-  logic new_com, new_com_saber; //used to know when to update x_com and y_com ...
+  logic new_com, new_com_saber, new_com_track; //used to know when to update x_com and y_com ...
 
   //crosshair output:
   logic [7:0] ch_red, ch_green, ch_blue;
@@ -134,7 +134,6 @@ module top_level(
     pixel_in <= pixel_buff;
   end
 
-  //clock manager...creates 74.25 MHz and 5 times 74.25 MHz for pixel and TMDS,respectively
   hdmi_clk_wiz_720p mhdmicw (
       .clk_pixel(clk_pixel),
       .clk_tmds(clk_5x),
@@ -143,7 +142,6 @@ module top_level(
       .clk_ref(clk_100mhz)
   );
 
-  //from week 04! (make sure you include in your hdl) (same as before)
   video_sig_gen mvg(
       .clk_pixel_in(clk_pixel),
       .rst_in(sys_rst),
@@ -446,6 +444,7 @@ module top_level(
   //grab logic for above
   //update center of mass x_com, y_com based on new_com signal
   always_ff @(posedge clk_pixel)begin
+    new_com_track <= new_com;
     if (sys_rst)begin
       x_com_saber <= 0;
       y_com_saber <= 0;
@@ -513,7 +512,7 @@ module top_level(
     .decoded_ir_in(ir_out),
     .decoded_ir_in_valid(code_out),
     .location_in(location_player),
-    .location_in_valid(new_com),
+    .location_in_valid(new_com_track),
     .pmod_in(gpio[2:0]),
     .pmod_out(gpio[5:3]),
     .player_data_out(player_data),
@@ -556,24 +555,49 @@ module top_level(
   //   .pixel_out({red,green,blue}) //output to tmds
   // );
 
+  // display_module plswork (
+  //   .clk_in(clk_pixel),
+  //   .rst_in(sys_rst),
+  //   .camera_sw(sw[4]),
+  //   .camera_pixel_in({r_in_pipe_1[3], g_in_pipe_1[3], b_in_pipe_1[3]}),
+  //   .hcount_in(h_count_pipe[6]),
+  //   .vcount_in(v_count_pipe[6]),
+  //   .nf_in(new_frame_pipe[6]),
+  //   .player_box_x_in(((player_data_sync.location.rect_x_2 + player_data_sync.location.rect_x) >> 1)),
+  //   .player_box_y_in(((player_data_sync.location.rect_y_2 + player_data_sync.location.rect_y) >> 1)),
+  //   .player_box_xmax_in(player_data_sync.location.rect_x_2),
+  //   .player_box_ymax_in(player_data_sync.location.rect_y_2),
+  //   .player_saber_x_in(player_data_sync.location.saber_x),
+  //   .player_saber_y_in(player_data_sync.location.saber_y),
+  //   .opponent_box_x_in(((opponent_data_sync.location.rect_x_2 + opponent_data_sync.location.rect_x) >> 1)),
+  //   .opponent_box_y_in(((opponent_data_sync.location.rect_y_2 + opponent_data_sync.location.rect_y) >> 1)),
+  //   .opponent_box_xmax_in(opponent_data_sync.location.rect_x_2),
+  //   .opponent_box_ymax_in(opponent_data_sync.location.rect_y_2),
+  //   .opponent_saber_x_in(opponent_data_sync.location.saber_x),
+  //   .opponent_saber_y_in(opponent_data_sync.location.saber_y),
+  //   .pixel_out({red, green, blue})
+  // );
+
   display_module plswork (
     .clk_in(clk_pixel),
     .rst_in(sys_rst),
+    .camera_sw(sw[4]),
+    .camera_pixel_in({r_in_pipe_1[3], g_in_pipe_1[3], b_in_pipe_1[3]}),
     .hcount_in(h_count_pipe[6]),
     .vcount_in(v_count_pipe[6]),
     .nf_in(new_frame_pipe[6]),
-    .player_box_x_in(((player_data_sync.location.rect_x_2 + player_data_sync.location.rect_x) >> 1)),
-    .player_box_y_in(((player_data_sync.location.rect_y_2 + player_data_sync.location.rect_y) >> 1)),
-    .player_box_xmax_in(player_data_sync.location.rect_x_2),
-    .player_box_ymax_in(player_data_sync.location.rect_y_2),
-    .player_saber_x_in(player_data_sync.location.saber_x),
-    .player_saber_y_in(player_data_sync.location.saber_y),
-    .opponent_box_x_in(((opponent_data_sync.location.rect_x_2 + opponent_data_sync.location.rect_x) >> 1)),
-    .opponent_box_y_in(((opponent_data_sync.location.rect_y_2 + opponent_data_sync.location.rect_y) >> 1)),
-    .opponent_box_xmax_in(opponent_data_sync.location.rect_x_2),
-    .opponent_box_ymax_in(opponent_data_sync.location.rect_x_2),
-    .opponent_saber_x_in(opponent_data_sync.location.saber_x),
-    .opponent_saber_y_in(opponent_data_sync.location.saber_x),
+    .player_box_x_in(x_com),
+    .player_box_y_in(y_com),
+    .player_box_xmax_in(w_com),
+    .player_box_ymax_in(h_com),
+    .player_saber_x_in(x_com_saber),
+    .player_saber_y_in(y_com_saber),
+    .opponent_box_x_in(30),
+    .opponent_box_y_in(30),
+    .opponent_box_xmax_in(200),
+    .opponent_box_ymax_in(200),
+    .opponent_saber_x_in(50),
+    .opponent_saber_y_in(300),
     .pixel_out({red, green, blue})
   );
 
