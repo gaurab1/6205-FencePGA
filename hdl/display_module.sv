@@ -4,6 +4,8 @@
 module display_module (
   input wire clk_in,
   input wire rst_in,
+  input wire camera_sw,
+  input wire [23:0] camera_pixel_in,
   input wire [10:0] hcount_in,
   input wire [9:0] vcount_in,
   input wire nf_in,
@@ -22,9 +24,10 @@ module display_module (
   output logic [23:0] pixel_out
 );
   
-  logic border;
-  logic [23:0] player_box, player_saber, opponent_box, opponent_saber;
+  logic border, display_start;
+  logic [23:0] player_box, player_saber, opponent_box, opponent_saber, show_start;
 
+  assign display_start = 0;
   transparent_block_sprite player(
     .hcount_in(hcount_in),
     .vcount_in(vcount_in),
@@ -77,8 +80,19 @@ module display_module (
     .green_out(opponent_box[15:8]),
     .blue_out(opponent_box[7:0]));
 
+  start_display menu (
+    .clk_in(clk_in),
+    .rst_in(rst_in),
+    .hcount_in(hcount_in),
+    .vcount_in(vcount_in),
+    .display_out(show_start)
+  );
+
   display_module_mux lol (
     .game_border_in(border),
+    .camera_pixel_in(camera_sw ? camera_pixel_in : 0),
+    .start_display(display_start),
+    .start_in(show_start),
     .player_box_in(player_box),
     .opponent_box_in(opponent_box),
     .player_saber_in(player_saber),
