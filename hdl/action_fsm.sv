@@ -94,17 +94,17 @@ module action_fsm(
       if (state_started) begin
         case (curr_state)
           REST: begin
-            player_data.saber_state = IN_REST;
+            player_data.saber_state <= IN_REST;
             if (block) begin
               curr_state <= BLOCK;
             end else if (lunge) begin
               curr_state <= LUNGE;
-              player_data.saber_attack_x = player_data.location.saber_x;
-              player_data.saber_attack_y = player_data.location.saber_y;
+              player_data.saber_attack_x <= player_data.location.saber_x;
+              player_data.saber_attack_y <= player_data.location.saber_y;
             end
           end
           BLOCK: begin
-            player_data.saber_state = IN_BLOCK;
+            player_data.saber_state <= IN_BLOCK;
             if (sabers_colliding) begin
               player_scored <= 1'b1;
             end
@@ -113,16 +113,16 @@ module action_fsm(
             end
           end
           LUNGE: begin
-            player_data.saber_state = IN_LUNGE;
+            player_data.saber_state <= IN_LUNGE;
             curr_state <= ATTACK;
           end
           ATTACK: begin
             in_attack <= 1'b1;
-            player_data.saber_state = IN_ATTACK;
+            player_data.saber_state <= IN_ATTACK;
             if (lunge == 0 && attack_intersecting) begin
               curr_state <= SCORE;
             end else if (opponent_scored) begin
-              player_data.health = player_data.health - 1;
+              player_data.health <= player_data.health - 1;
               // handle 0 case here?
               curr_state <= RECOVER;
             end else if (lunge == 0) begin
@@ -130,13 +130,13 @@ module action_fsm(
             end
           end
           SCORE: begin
-            player_data.saber_state = IN_REST;
+            player_data.saber_state <= IN_REST;
             // Increment score
             player_scored <= 1'b1;
             curr_state <= RECOVER;
           end
           RECOVER: begin
-            player_data.saber_state = IN_REST;
+            player_data.saber_state <= IN_REST;
           end
         endcase
         state_started <= 0;

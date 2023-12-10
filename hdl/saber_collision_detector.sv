@@ -13,7 +13,7 @@ module saber_collision_detector(
     output logic is_colliding
   );
 
-  
+  assign is_colliding = 0;
   
 endmodule
 

@@ -17,7 +17,7 @@ module top_level(
   output logic [3:0] ss1_an,
   input wire [7:0] pmoda,
   input wire [7:0] pmodb,
-  input wire [5:0] gpio,
+  inout wire [5:0] gpio,
   output logic pmodbclk,
   output logic pmodblock
   );
@@ -375,7 +375,7 @@ module top_level(
   // );
   seven_segment_controller(.clk_in(clk_pixel),
                            .rst_in(sys_rst),
-                           .val_in(ir_out),
+                           .val_in(player_data_sync.location.rect_x_2),
                            .cat_out(ss_c),
                            .an_out({ss0_an, ss1_an}));
   assign ss0_c = ss_c; //control upper four digit's cathodes!

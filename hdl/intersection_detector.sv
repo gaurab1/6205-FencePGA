@@ -158,8 +158,6 @@ module cross_product(
 
   logic signed [25:0] x_1_y_2_s;
   logic signed [25:0] x_2_y_1_s;
-  
-  logic signed [26:0] result;
 
   always_comb begin
     start_x_1_s = $signed({1'b0, start_x_1});
@@ -179,8 +177,7 @@ module cross_product(
     x_1_y_2_s = delta_x_1_s * delta_y_2_s;
     x_2_y_1_s = delta_x_2_s * delta_y_1_s;
 
-    result = x_1_y_2_s - x_2_y_1_s;
-    cross_is_positive = (result > 0);
+    cross_is_positive = (x_1_y_2_s > x_2_y_1_s);
   end
 endmodule
 

@@ -37,6 +37,9 @@ module state_transmitter(
       player_scored <= 0;
       location_data_received <= 0;
       location_out_valid <= 0;
+    end else if (fsm_data_received && location_data_received && sel_out) begin
+      fsm_data_received <= 0;
+      location_data_received <= 0;
     end else begin
       if (old_player_data_in_valid) begin
         fsm_data_received <= 1'b1;
@@ -67,14 +70,6 @@ module state_transmitter(
     .data_clk_out(data_clk_out),
     .sel_out(sel_out)
   );
-
-  always_ff @(posedge clk_pixel_in) begin
-    if (fsm_data_received && location_data_received && sel_out) begin
-      fsm_data_received <= 0;
-      location_data_received <= 0;
-    end
-  end
-  
   
 endmodule
 
