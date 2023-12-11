@@ -5,6 +5,8 @@
 module state_transmitter(
     input wire clk_pixel_in,
     input wire rst_in,
+    input wire self_started_in,
+    input wire opponent_started_in,
     input data_t old_player_data_in,
     input wire player_scored_in,
     input wire old_player_data_in_valid,
@@ -25,6 +27,8 @@ module state_transmitter(
   logic fsm_data_received;
   logic location_data_received;
 
+  logic clk_output;
+
   always_comb begin
     new_player_data = old_player_data;
     new_player_data.location = location;
@@ -37,9 +41,15 @@ module state_transmitter(
       player_scored <= 0;
       location_data_received <= 0;
       location_out_valid <= 0;
+      data_clk_out <= 0;
+    end else if (self_started_in == 0) begin
+      data_clk_out <= 0;
+    end else if (opponent_started_in == 0) begin
+      data_clk_out <= 1'b1;
     end else if (fsm_data_received && location_data_received && sel_out) begin
       fsm_data_received <= 0;
       location_data_received <= 0;
+      data_clk_out <= clk_output;
     end else begin
       if (old_player_data_in_valid) begin
         fsm_data_received <= 1'b1;
@@ -55,6 +65,7 @@ module state_transmitter(
       end else begin
         location_out_valid <= 0;
       end
+      data_clk_out <= clk_output;
     end
   end
 
@@ -65,9 +76,9 @@ module state_transmitter(
     .clk_in(clk_pixel_in),
     .rst_in(rst_in),
     .data_in({new_player_data, player_scored}),
-    .trigger_in(fsm_data_received && location_data_received),
+    .trigger_in(fsm_data_received && location_data_received && self_started_in && opponent_started_in),
     .data_out(data_out),
-    .data_clk_out(data_clk_out),
+    .data_clk_out(clk_output),
     .sel_out(sel_out)
   );
   

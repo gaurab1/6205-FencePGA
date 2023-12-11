@@ -24,9 +24,23 @@ module attack_logic (
   location_t player_location;
   logic player_location_valid;
 
+  logic self_started;
+  logic opponent_started;
+
+  
+  always_ff @(posedge clk_pixel_in) begin
+    if (rst_in) begin
+      self_started <= 0;
+    end else if (decoded_ir_in == 32'h20DF_5BA4 || decoded_ir_in == 32'h20DF_5AA5) begin
+      self_started <= 1'b1;
+    end
+  end
+
   state_transmitter transmitter_inst(
     .clk_pixel_in(clk_pixel_in),
     .rst_in(rst_in),
+    .self_started_in(self_started),
+    .opponent_started_in(opponent_started),
     .old_player_data_in(fsm_player_data),
     .player_scored_in(player_scored),
     .old_player_data_in_valid(fsm_player_data_valid),
@@ -78,7 +92,8 @@ module attack_logic (
     .player_location_out(syncer_player_location),
     .opponent_data_out(opponent_data),
     .opponent_scored_out(opponent_scored),
-    .data_out_valid(syncer_data_valid)
+    .data_out_valid(syncer_data_valid),
+    .opponent_started_out(opponent_started)
   );
 
   action_fsm action_fsm_inst(
