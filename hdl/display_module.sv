@@ -4,6 +4,7 @@
 module display_module (
   input wire clk_in,
   input wire rst_in,
+  input wire [23:0] img_sprite_in,
   input wire [31:0] ir_in,
   input wire start_screen,
   input wire camera_sw,
@@ -31,7 +32,7 @@ module display_module (
 
   always_ff @(posedge clk_in) begin
     if (rst_in) begin
-        display_start <= 0;
+        display_start <= 1;
     end else if (ir_in == 32'h20DF_5BA4 || ir_in == 32'h20DF_5AA5) begin
         display_start <= 0;
     end
@@ -93,6 +94,7 @@ module display_module (
   start_display menu (
     .clk_in(clk_in),
     .rst_in(rst_in),
+    .img_sprite_in(img_sprite_in),
     .hcount_in(hcount_in),
     .vcount_in(vcount_in),
     .display_out(show_start)

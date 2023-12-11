@@ -109,6 +109,9 @@ module top_level(
   //crosshair output:
   logic [7:0] ch_red, ch_green, ch_blue;
 
+  //image_sprite output:
+  logic [7:0] img_red, img_green, img_blue;
+
   location_t location_player;
 
   //used with switches for display selections
@@ -302,18 +305,43 @@ module top_level(
   logic [7:0] r_in_pipe [2:0]; //PS1
   logic [7:0] g_in_pipe [2:0];
   logic [7:0] b_in_pipe [2:0];
+  logic [7:0] img_red_pipe[2:0];
+  logic [7:0] img_green_pipe[2:0];
+  logic [7:0] img_blue_pipe[2:0];
 
   always_ff @(posedge clk_pixel)begin
     r_in_pipe[0] <= fb_red;
     g_in_pipe[0] <= fb_green;
     b_in_pipe[0] <= fb_blue;
+    img_red_pipe[0] <= img_red;
+    img_green_pipe[0] <= img_green;
+    img_blue_pipe[0] <= img_blue;
     for (int i=1; i<3; i = i+1)begin
       r_in_pipe[i] <= r_in_pipe[i-1];
       g_in_pipe[i] <= g_in_pipe[i-1];
       b_in_pipe[i] <= b_in_pipe[i-1];
+      img_red_pipe[i] <= img_red_pipe[i-1];
+      img_green_pipe[i] <= img_green_pipe[i-1];
+      img_blue_pipe[i] <= img_blue_pipe[i-1];
     end
   end
   assign channel_sel = sw[3:1];
+
+
+  image_sprite #(
+    .WIDTH(853),
+    .HEIGHT(357))
+    com_sprite_m (
+    .pixel_clk_in(clk_pixel),
+    .rst_in(sys_rst),
+    .hcount_in(hcount),   //(PS3 or None depending on choice)
+    .vcount_in(vcount),   //(PS3 or None depending on choice)
+    .x_in(50),
+    .y_in(50),
+    .red_out(img_red),
+    .green_out(img_green),
+    .blue_out(img_blue));
+
   // * 3'b000: green
   // * 3'b001: red
   // * 3'b010: blue
@@ -456,17 +484,39 @@ module top_level(
       if (new_com) begin
         x_com <= x_com_calc;
         y_com <= y_com_calc;
-        w_com <= w_com_calc < {1'b0, x_com} ? w_com_calc : {1'b0, x_com};
-        h_com <= h_com_calc < {1'b0, y_com} ? h_com_calc : {1'b0, y_com};
+        w_com <= w_com_calc;
+        h_com <= h_com_calc;
+
+        location_player.rect_x <= (x_com_calc << 1) - w_com_calc;
+        location_player.rect_y <= (y_com_calc << 1) - h_com_calc;
+        location_player.rect_x_2 <= w_com_calc;
+        location_player.rect_y_2 <= h_com_calc;
+        
       end
       if (new_com_saber) begin
         x_com_saber <= x_com_calc_saber;
         y_com_saber <= y_com_calc_saber;
+
+        location_player.saber_x <= x_com_calc_saber;
+        location_player.saber_y <= y_com_calc_saber;
       end
     end
   end
+  // logic [10:0] player_rect_x;
+  // logic [9:0] player_rect_y;
+  // assign player_rect_x = (x_com << 1) - w_com;
+  // assign player_rect_y = (y_com << 1) - h_com;
 
-  assign location_player = {(x_com << 1) - w_com, (y_com << 1) - h_com, w_com, h_com, x_com_saber, y_com_saber};
+  // assign location_player.rect_x = player_rect_x;
+  // assign location_player.rect_y = player_rect_y;
+  // assign location_player.rect_x_2 = w_com;
+  // assign location_player.rect_y_2 = h_com;
+  // assign location_player.saber_x = x_com_saber;
+  // assign location_player.saber_y = y_com_saber;
+
+
+
+
   //Create Crosshair patter on center of mass:
   //0 cycle latency
   //TODO: Should be using output of (PS3)
@@ -509,7 +559,7 @@ module top_level(
   attack_logic attaaaack (
     .clk_pixel_in(clk_pixel),
     .rst_in(sys_rst),
-    .decoded_ir_in(ir_out),
+    .decoded_ir_in(btn[2]),
     .decoded_ir_in_valid(code_out),
     .location_in(location_player),
     .location_in_valid(new_com_track),
@@ -555,52 +605,53 @@ module top_level(
   //   .pixel_out({red,green,blue}) //output to tmds
   // );
 
-  display_module plswork (
-    .clk_in(clk_pixel),
-    .rst_in(sys_rst),
-    .camera_sw(sw[4]),
-    .camera_pixel_in({r_in_pipe_1[3], g_in_pipe_1[3], b_in_pipe_1[3]}),
-    .hcount_in(h_count_pipe[6]),
-    .vcount_in(v_count_pipe[6]),
-    .nf_in(new_frame_pipe[6]),
-    .player_box_x_in((player_data_sync.location.rect_x_2 >>1) + (player_data_sync.location.rect_x >> 1)),
-    .player_box_y_in((player_data_sync.location.rect_y_2 >> 1) + (player_data_sync.location.rect_y >> 1)),
-    .player_box_xmax_in(player_data_sync.location.rect_x_2),
-    .player_box_ymax_in(player_data_sync.location.rect_y_2),
-    .player_saber_x_in(player_data_sync.location.saber_x),
-    .player_saber_y_in(player_data_sync.location.saber_y),
-    .opponent_box_x_in((opponent_data_sync.location.rect_x_2 >> 1) + (opponent_data_sync.location.rect_x >> 1)),
-    .opponent_box_y_in((opponent_data_sync.location.rect_y_2 >> 1) + (opponent_data_sync.location.rect_y >> 1)),
-    .opponent_box_xmax_in(opponent_data_sync.location.rect_x_2),
-    .opponent_box_ymax_in(opponent_data_sync.location.rect_y_2),
-    .opponent_saber_x_in(opponent_data_sync.location.saber_x),
-    .opponent_saber_y_in(opponent_data_sync.location.saber_y),
-    .pixel_out({red, green, blue})
-  );
-
   // display_module plswork (
   //   .clk_in(clk_pixel),
   //   .rst_in(sys_rst),
-  //   .ir_in(ir_out),
   //   .camera_sw(sw[4]),
   //   .camera_pixel_in({r_in_pipe_1[3], g_in_pipe_1[3], b_in_pipe_1[3]}),
   //   .hcount_in(h_count_pipe[6]),
   //   .vcount_in(v_count_pipe[6]),
   //   .nf_in(new_frame_pipe[6]),
-  //   .player_box_x_in(x_com),
-  //   .player_box_y_in(y_com),
-  //   .player_box_xmax_in(w_com),
-  //   .player_box_ymax_in(h_com),
-  //   .player_saber_x_in(x_com_saber),
-  //   .player_saber_y_in(y_com_saber),
-  //   .opponent_box_x_in(30),
-  //   .opponent_box_y_in(30),
-  //   .opponent_box_xmax_in(200),
-  //   .opponent_box_ymax_in(200),
-  //   .opponent_saber_x_in(50),
-  //   .opponent_saber_y_in(300),
+  //   .player_box_x_in((player_data_sync.location.rect_x_2 >>1) + (player_data_sync.location.rect_x >> 1)),
+  //   .player_box_y_in((player_data_sync.location.rect_y_2 >> 1) + (player_data_sync.location.rect_y >> 1)),
+  //   .player_box_xmax_in(player_data_sync.location.rect_x_2),
+  //   .player_box_ymax_in(player_data_sync.location.rect_y_2),
+  //   .player_saber_x_in(player_data_sync.location.saber_x),
+  //   .player_saber_y_in(player_data_sync.location.saber_y),
+  //   .opponent_box_x_in((opponent_data_sync.location.rect_x_2 >> 1) + (opponent_data_sync.location.rect_x >> 1)),
+  //   .opponent_box_y_in((opponent_data_sync.location.rect_y_2 >> 1) + (opponent_data_sync.location.rect_y >> 1)),
+  //   .opponent_box_xmax_in(opponent_data_sync.location.rect_x_2),
+  //   .opponent_box_ymax_in(opponent_data_sync.location.rect_y_2),
+  //   .opponent_saber_x_in(opponent_data_sync.location.saber_x),
+  //   .opponent_saber_y_in(opponent_data_sync.location.saber_y),
   //   .pixel_out({red, green, blue})
   // );
+
+  display_module plswork (
+    .clk_in(clk_pixel),
+    .rst_in(sys_rst),
+    .img_sprite_in({img_red_pipe[2], img_green_pipe[2], img_blue_pipe[2]}),
+    .ir_in(ir_out),
+    .camera_sw(sw[4]),
+    .camera_pixel_in({r_in_pipe_1[3], g_in_pipe_1[3], b_in_pipe_1[3]}),
+    .hcount_in(h_count_pipe[6]),
+    .vcount_in(v_count_pipe[6]),
+    .nf_in(new_frame_pipe[6]),
+    .player_box_x_in((location_player.rect_x_2 >>1) + (location_player.rect_x >> 1)),
+    .player_box_y_in((location_player.rect_y_2 >>1) + (location_player.rect_y >> 1)),
+    .player_box_xmax_in(location_player.rect_x_2),
+    .player_box_ymax_in(location_player.rect_y_2),
+    .player_saber_x_in(location_player.saber_x),
+    .player_saber_y_in(location_player.saber_y),
+    .opponent_box_x_in(30),
+    .opponent_box_y_in(30),
+    .opponent_box_xmax_in(200),
+    .opponent_box_ymax_in(200),
+    .opponent_saber_x_in(50),
+    .opponent_saber_y_in(300),
+    .pixel_out({red, green, blue})
+  );
 
   //three tmds_encoders (blue, green, red)
   tmds_encoder tmds_red(
