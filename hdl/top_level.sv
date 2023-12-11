@@ -383,22 +383,12 @@ module top_level(
   threshold(
      .clk_in(clk_pixel),
      .rst_in(sys_rst),
-     .pixel_in(cb),
-     .lower_bound_in(8'b00001110),
-     .upper_bound_in(8'b00100000),
+     .pixel_in(g_in_pipe[2]),
+     .lower_bound_in(8'b00110000),
+     .upper_bound_in(8'b01010000),
      .mask_out(mask_saber) //single bit if pixel within mask.
   );
 
-  //modified version of seven segment display for showing
-  // thresholds and selected channel
-  // lab05_ssc mssc(.clk_in(clk_pixel),
-  //                .rst_in(sys_rst),
-  //                .lt_in(lower_threshold),
-  //                .ut_in(upper_threshold),
-  //                .channel_sel_in(channel_sel),
-  //                .cat_out(ss_c),
-  //                .an_out({ss0_an, ss1_an})
-  // );
   seven_segment_controller(.clk_in(clk_pixel),
                            .rst_in(sys_rst),
                            .val_in(ir_out),
@@ -644,12 +634,14 @@ module top_level(
     .player_box_ymax_in(location_player.rect_y_2),
     .player_saber_x_in(location_player.saber_x),
     .player_saber_y_in(location_player.saber_y),
+    .player_health_in(5),
     .opponent_box_x_in(30),
     .opponent_box_y_in(30),
     .opponent_box_xmax_in(200),
     .opponent_box_ymax_in(200),
     .opponent_saber_x_in(50),
     .opponent_saber_y_in(300),
+    .opponent_health_in(5),
     .pixel_out({red, green, blue})
   );
 

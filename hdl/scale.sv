@@ -25,6 +25,10 @@ module scale(
       valid_addr_out = hcount_in <480 && vcount_in <640;
       scaled_hcount_out = hcount_in>>1;
       scaled_vcount_out = vcount_in>>1;
+    end else begin
+      valid_addr_out = hcount_in < 960  && vcount_in <640;
+      scaled_hcount_out = hcount_in>>2;
+      scaled_vcount_out = vcount_in>>1;
     end
   end
 

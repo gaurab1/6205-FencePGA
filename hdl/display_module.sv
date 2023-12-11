@@ -18,17 +18,19 @@ module display_module (
   input wire [10:0] player_box_ymax_in,
   input wire [11:0] player_saber_x_in,
   input wire [10:0] player_saber_y_in,
+  input wire [2:0] player_health_in,
   input wire [11:0] opponent_box_x_in,
   input wire [10:0] opponent_box_y_in,
   input wire [11:0] opponent_box_xmax_in,
   input wire [10:0] opponent_box_ymax_in,
   input wire [11:0] opponent_saber_x_in,
   input wire [10:0] opponent_saber_y_in,
+  input wire [2:0] opponent_health_in,
   output logic [23:0] pixel_out
 );
   
   logic border, display_start;
-  logic [23:0] player_box, player_saber, opponent_box, opponent_saber, show_start;
+  logic [23:0] player_box, player_saber, opponent_box, opponent_saber, show_start, player_health, opponent_health;
 
   always_ff @(posedge clk_in) begin
     if (rst_in) begin
@@ -50,15 +52,27 @@ module display_module (
     .green_out(player_box[15:8]),
     .blue_out(player_box[7:0]));
 
-//   fixed_block_sprite playersaber(
-//     .hcount_in(hcount_in),
-//     .vcount_in(vcount_in),
-//     .x_in(player_saber_x_in),
-//     .y_in(player_saber_y_in),
-//     .red_out(player_saber[23:16]),
-//     .green_out(player_saber[15:8]),
-//     .blue_out(player_saber[7:0])
-//   );
+  display_health #(.COLOR(24'h00_00_FF)) playerhealth(
+    .clk_in(clk_in),
+    .rst_in(rst_in),
+    .hcount_in(hcount_in),
+    .vcount_in(vcount_in),
+    .x_in(200),
+    .y_in(20),
+    .health(player_health_in),
+    .color_out(player_health)
+  );
+
+  display_health #(.COLOR(24'hFF_00_00)) opponenthealth(
+    .clk_in(clk_in),
+    .rst_in(rst_in),
+    .hcount_in(hcount_in),
+    .vcount_in(vcount_in),
+    .x_in(560),
+    .y_in(20),
+    .health(opponent_health_in),
+    .color_out(opponent_health)
+  );
 
   trace_display playersaber(
   .clk_in(clk_in),
@@ -101,6 +115,7 @@ module display_module (
   );
 
   display_module_mux lol (
+    .clk_in(clk_in),
     .game_border_in(border),
     .camera_pixel_in(camera_sw ? camera_pixel_in : 0),
     .start_display(display_start),
@@ -109,6 +124,8 @@ module display_module (
     .opponent_box_in(opponent_box),
     .player_saber_in(player_saber),
     .opponent_saber_in(opponent_saber),
+    .player_health_in(player_health),
+    .opponent_health_in(opponent_health),
     .pixel_out(pixel_out)
   );
 

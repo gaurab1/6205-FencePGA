@@ -2,6 +2,7 @@
 `default_nettype none // prevents system from inferring an undeclared logic (good practice)
 
 module display_module_mux (
+  input wire clk_in,
   input wire game_border_in,
   input wire [23:0] camera_pixel_in,
   input wire start_display,
@@ -10,10 +11,25 @@ module display_module_mux (
   input wire [23:0] opponent_box_in,
   input wire [23:0] player_saber_in,
   input wire [23:0] opponent_saber_in,
+  input wire [23:0] player_health_in,
+  input wire [23:0] opponent_health_in,
   output logic [23:0] pixel_out
 );
  // assign pixel_out = 24'hFFFFFF;
- assign pixel_out = game_border_in ? 24'hFFFFFF: player_saber_in ? player_saber_in : start_display ? (start_in? start_in: 0) : opponent_saber_in ? opponent_saber_in : (player_box_in != 0) ? player_box_in : opponent_box_in ? opponent_box_in : camera_pixel_in ? camera_pixel_in : 0;
+ logic [23:0] game_border_delayed, camera_pixel_delayed, start_display_delayed, start_delayed, player_box_delayed, opponent_box_delayed, player_saber_delayed, opponent_saber_delayed, player_health_delayed, opponent_health_delayed;
+ always_ff @(posedge clk_in) begin
+  game_border_delayed <= game_border_in;
+  camera_pixel_delayed <= camera_pixel_in;
+  start_display_delayed <= start_display;
+  start_delayed <= start_in;
+  player_box_delayed <= player_box_in;
+  opponent_box_delayed <= opponent_box_in;
+  player_saber_delayed <= player_saber_in;
+  opponent_saber_delayed <= opponent_saber_in;
+  player_health_delayed <= player_health_in;
+  opponent_health_delayed <= opponent_health_in;
+ end
+ assign pixel_out = game_border_delayed ? 24'hFFFFFF: player_saber_delayed ? player_saber_delayed : start_display_delayed ? (start_delayed? start_delayed: 0) : player_health_delayed ? player_health_delayed : opponent_health_delayed ? opponent_health_delayed : opponent_saber_delayed ? opponent_saber_delayed : (player_box_delayed != 0) ? player_box_delayed : opponent_box_delayed ? opponent_box_delayed : camera_pixel_delayed ? camera_pixel_delayed : 0;
 endmodule
 
 `default_nettype wire
