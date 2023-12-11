@@ -79,7 +79,7 @@ module transparent_block_sprite #(COLOR=24'h00_FF_00)(
 endmodule
 
 module circle_sprite #(
-  parameter RADIUS=15, COLOR=24'hFF_FF_FF)(
+  parameter RADIUS=12, COLOR=24'hFF_FF_FF)(
   input wire [10:0] hcount_in,
   input wire [9:0] vcount_in,
   input wire [10:0] x_in,
@@ -105,6 +105,8 @@ module circle_sprite #(
 endmodule
 
 module transparent_triangle_sprite #(COLOR=24'hFF_FF_FF)(
+  input wire clk_in,
+  input wire rst_in,
   input wire [10:0] hcount_in,
   input wire [9:0] vcount_in,
   input wire [10:0] x1_in,

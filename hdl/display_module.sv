@@ -4,6 +4,8 @@
 module display_module (
   input wire clk_in,
   input wire rst_in,
+  input wire [31:0] ir_in,
+  input wire start_screen,
   input wire camera_sw,
   input wire [23:0] camera_pixel_in,
   input wire [10:0] hcount_in,
@@ -27,7 +29,15 @@ module display_module (
   logic border, display_start;
   logic [23:0] player_box, player_saber, opponent_box, opponent_saber, show_start;
 
-  assign display_start = 0;
+  always_ff @(posedge clk_in) begin
+    if (rst_in) begin
+        display_start <= 1;
+    end else if (ir_in == 32'h20DF_5BA4 || ir_in == 32'h20DF_5AA5) begin
+        display_start <= 0;
+    end
+  end
+
+
   transparent_block_sprite player(
     .hcount_in(hcount_in),
     .vcount_in(vcount_in),

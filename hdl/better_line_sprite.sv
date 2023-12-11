@@ -101,7 +101,7 @@ module line_sprite #(
             x <= x + 1;
             if ($signed(D) > 0) begin
                 y <= y + yi;
-                D <= $signed(D) + (($signed(dy) - $signed(dx)) <<< 1);
+                D <= $signed(D) + $signed(($signed(dy) - $signed(dx)) <<< 1);
             end else begin
                 D <= $signed(D) + ($signed(dy) <<< 1);
             end

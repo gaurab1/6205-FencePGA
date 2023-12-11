@@ -373,7 +373,7 @@ module top_level(
   // );
   seven_segment_controller(.clk_in(clk_pixel),
                            .rst_in(sys_rst),
-                           .val_in(player_data_sync.location.rect_x_2),
+                           .val_in(ir_out),
                            .cat_out(ss_c),
                            .an_out({ss0_an, ss1_an}));
   assign ss0_c = ss_c; //control upper four digit's cathodes!
@@ -581,6 +581,7 @@ module top_level(
   display_module plswork (
     .clk_in(clk_pixel),
     .rst_in(sys_rst),
+    .ir_in(ir_out),
     .camera_sw(sw[4]),
     .camera_pixel_in({r_in_pipe_1[3], g_in_pipe_1[3], b_in_pipe_1[3]}),
     .hcount_in(h_count_pipe[6]),
