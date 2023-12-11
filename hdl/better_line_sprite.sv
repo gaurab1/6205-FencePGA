@@ -37,7 +37,7 @@ module better_line #(
         y <= y1_in;
         D <= ($signed(dy) <<< 1) - $signed(dx);
     end else begin
-        if (hcount_in == x && vcount_in == y) begin
+        if (hcount_in == x) begin
             x <= x + 1;
             if ($signed(D) > 0) begin
                 y <= y + 1;
@@ -71,13 +71,13 @@ module line_sprite #(
   output logic [7:0] blue_out
   );
 
-  logic signed [10:0] dx, dy, D;
-  logic signed [1:0] yi;
+  logic signed [11:0] dx, dy, D;
+  logic yi;
   logic [10:0] x;
   logic [9:0] y;
-  assign dx = $signed(x2_in) - $signed(x1_in);
-  assign dy = (($signed(y2_in) - $signed(y1_in)) > 0) ? $signed(y2_in) - $signed(y1_in) : $signed(y1_in) - $signed(y2_in);
-  assign yi = (($signed(y2_in) - $signed(y1_in)) > 0) ? 1 : -1;
+  assign dx = $signed(x2_in - x1_in);
+  assign dy = (y2_in > y1_in) ? $signed(y2_in - y1_in) : $signed(y1_in - y2_in);
+  assign yi = (y2_in > y1_in) ? 1 : 0;
 
   always_comb begin
     if (hcount_in == x && vcount_in == y) begin
@@ -97,11 +97,11 @@ module line_sprite #(
         y <= y1_in;
         D <= ($signed(dy) <<< 1) - $signed(dx);
     end else begin
-        if (hcount_in == x && vcount_in == y) begin
+        if (hcount_in == x) begin
             x <= x + 1;
             if ($signed(D) > 0) begin
-                y <= y + yi;
-                D <= $signed(D) + $signed(($signed(dy) - $signed(dx)) <<< 1);
+                y <= (yi) ? y + 1 : y - 1;
+                D <= $signed(D) + ($signed(dy) <<< 1) - ($signed(dx) <<< 1);
             end else begin
                 D <= $signed(D) + ($signed(dy) <<< 1);
             end
@@ -128,7 +128,7 @@ module bad_line_sprite #(
   output logic [7:0] green_out,
   output logic [7:0] blue_out);
 
-  logic in_sprite;
+  logic in_sprite, in_sprite_gray;
   logic [20:0] left_mul, right_mul;
   assign left_mul = x2_in*y1_in + hcount_in*y2_in + vcount_in*x1_in;
   assign right_mul = x1_in*y2_in + hcount_in*y1_in + vcount_in*x2_in;
