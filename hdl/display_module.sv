@@ -31,7 +31,7 @@ module display_module (
 
   always_ff @(posedge clk_in) begin
     if (rst_in) begin
-        display_start <= 1;
+        display_start <= 0;
     end else if (ir_in == 32'h20DF_5BA4 || ir_in == 32'h20DF_5AA5) begin
         display_start <= 0;
     end

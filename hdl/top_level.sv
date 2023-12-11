@@ -456,8 +456,8 @@ module top_level(
       if (new_com) begin
         x_com <= x_com_calc;
         y_com <= y_com_calc;
-        w_com <= w_com_calc;
-        h_com <= h_com_calc;
+        w_com <= w_com < {1'b0, x_com} ? w_com_calc : {1'b0, x_com};
+        h_com <= h_com < {1'b0, y_com} ? h_com_calc : {1'b0, y_com};
       end
       if (new_com_saber) begin
         x_com_saber <= x_com_calc_saber;
@@ -555,52 +555,52 @@ module top_level(
   //   .pixel_out({red,green,blue}) //output to tmds
   // );
 
-  // display_module plswork (
-  //   .clk_in(clk_pixel),
-  //   .rst_in(sys_rst),
-  //   .camera_sw(sw[4]),
-  //   .camera_pixel_in({r_in_pipe_1[3], g_in_pipe_1[3], b_in_pipe_1[3]}),
-  //   .hcount_in(h_count_pipe[6]),
-  //   .vcount_in(v_count_pipe[6]),
-  //   .nf_in(new_frame_pipe[6]),
-  //   .player_box_x_in(((player_data_sync.location.rect_x_2 + player_data_sync.location.rect_x) >> 1)),
-  //   .player_box_y_in(((player_data_sync.location.rect_y_2 + player_data_sync.location.rect_y) >> 1)),
-  //   .player_box_xmax_in(player_data_sync.location.rect_x_2),
-  //   .player_box_ymax_in(player_data_sync.location.rect_y_2),
-  //   .player_saber_x_in(player_data_sync.location.saber_x),
-  //   .player_saber_y_in(player_data_sync.location.saber_y),
-  //   .opponent_box_x_in(((opponent_data_sync.location.rect_x_2 + opponent_data_sync.location.rect_x) >> 1)),
-  //   .opponent_box_y_in(((opponent_data_sync.location.rect_y_2 + opponent_data_sync.location.rect_y) >> 1)),
-  //   .opponent_box_xmax_in(opponent_data_sync.location.rect_x_2),
-  //   .opponent_box_ymax_in(opponent_data_sync.location.rect_y_2),
-  //   .opponent_saber_x_in(opponent_data_sync.location.saber_x),
-  //   .opponent_saber_y_in(opponent_data_sync.location.saber_y),
-  //   .pixel_out({red, green, blue})
-  // );
-
   display_module plswork (
     .clk_in(clk_pixel),
     .rst_in(sys_rst),
-    .ir_in(ir_out),
     .camera_sw(sw[4]),
     .camera_pixel_in({r_in_pipe_1[3], g_in_pipe_1[3], b_in_pipe_1[3]}),
     .hcount_in(h_count_pipe[6]),
     .vcount_in(v_count_pipe[6]),
     .nf_in(new_frame_pipe[6]),
-    .player_box_x_in(x_com),
-    .player_box_y_in(y_com),
-    .player_box_xmax_in(w_com),
-    .player_box_ymax_in(h_com),
-    .player_saber_x_in(x_com_saber),
-    .player_saber_y_in(y_com_saber),
-    .opponent_box_x_in(30),
-    .opponent_box_y_in(30),
-    .opponent_box_xmax_in(200),
-    .opponent_box_ymax_in(200),
-    .opponent_saber_x_in(50),
-    .opponent_saber_y_in(300),
+    .player_box_x_in(((player_data_sync.location.rect_x_2 + player_data_sync.location.rect_x) >> 1)),
+    .player_box_y_in(((player_data_sync.location.rect_y_2 + player_data_sync.location.rect_y) >> 1)),
+    .player_box_xmax_in(player_data_sync.location.rect_x_2),
+    .player_box_ymax_in(player_data_sync.location.rect_y_2),
+    .player_saber_x_in(player_data_sync.location.saber_x),
+    .player_saber_y_in(player_data_sync.location.saber_y),
+    .opponent_box_x_in(((opponent_data_sync.location.rect_x_2 + opponent_data_sync.location.rect_x) >> 1)),
+    .opponent_box_y_in(((opponent_data_sync.location.rect_y_2 + opponent_data_sync.location.rect_y) >> 1)),
+    .opponent_box_xmax_in(opponent_data_sync.location.rect_x_2),
+    .opponent_box_ymax_in(opponent_data_sync.location.rect_y_2),
+    .opponent_saber_x_in(opponent_data_sync.location.saber_x),
+    .opponent_saber_y_in(opponent_data_sync.location.saber_y),
     .pixel_out({red, green, blue})
   );
+
+  // display_module plswork (
+  //   .clk_in(clk_pixel),
+  //   .rst_in(sys_rst),
+  //   .ir_in(ir_out),
+  //   .camera_sw(sw[4]),
+  //   .camera_pixel_in({r_in_pipe_1[3], g_in_pipe_1[3], b_in_pipe_1[3]}),
+  //   .hcount_in(h_count_pipe[6]),
+  //   .vcount_in(v_count_pipe[6]),
+  //   .nf_in(new_frame_pipe[6]),
+  //   .player_box_x_in(x_com),
+  //   .player_box_y_in(y_com),
+  //   .player_box_xmax_in(w_com),
+  //   .player_box_ymax_in(h_com),
+  //   .player_saber_x_in(x_com_saber),
+  //   .player_saber_y_in(y_com_saber),
+  //   .opponent_box_x_in(30),
+  //   .opponent_box_y_in(30),
+  //   .opponent_box_xmax_in(200),
+  //   .opponent_box_ymax_in(200),
+  //   .opponent_saber_x_in(50),
+  //   .opponent_saber_y_in(300),
+  //   .pixel_out({red, green, blue})
+  // );
 
   //three tmds_encoders (blue, green, red)
   tmds_encoder tmds_red(
