@@ -549,7 +549,7 @@ module top_level(
   attack_logic attaaaack (
     .clk_pixel_in(clk_pixel),
     .rst_in(sys_rst),
-    .decoded_ir_in(btn[2]),
+    .decoded_ir_in(ir_out),
     .decoded_ir_in_valid(code_out),
     .location_in(location_player),
     .location_in_valid(new_com_track),
@@ -584,6 +584,8 @@ module top_level(
   display_module plswork (
     .clk_in(clk_pixel),
     .rst_in(sys_rst),
+    .img_sprite_in({img_red_pipe[2], img_green_pipe[2], img_blue_pipe[2]}),
+    .ir_in(ir_out),
     .camera_sw(sw[4]),
     .camera_pixel_in({r_in_pipe_1[3], g_in_pipe_1[3], b_in_pipe_1[3]}),
     .hcount_in(h_count_pipe[6]),

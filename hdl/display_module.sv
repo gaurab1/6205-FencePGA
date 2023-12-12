@@ -18,6 +18,8 @@ module display_module (
   input wire [10:0] player_box_ymax_in,
   input wire [11:0] player_saber_x_in,
   input wire [10:0] player_saber_y_in,
+  input wire [11:0] pre_saber_x_in,
+  input wire [10:0] pre_saber_y_in,
   input wire [2:0] player_health_in,
   input wire [1:0] player_saber_state_in,
   input wire [11:0] opponent_box_x_in,
@@ -33,14 +35,20 @@ module display_module (
   
   logic border, display_start;
   logic [23:0] player_box, player_saber, opponent_box, opponent_saber, show_start, player_health, opponent_health;
+  logic [11:0] player_saber_x;
+  logic [10:0] player_saber_y;
   logic [23:0] player_saber_color, opponent_saber_color;
 
   always_ff @(posedge clk_in) begin
     if (rst_in) begin
         display_start <= 1;
+        player_saber_x <= pre_saber_x_in;
+        player_saber_y <= pre_saber_y_in;
     end else begin
       if (ir_in == 32'h20DF_5BA4 || ir_in == 32'h20DF_5AA5) begin
         display_start <= 0;
+        player_saber_x <= player_saber_x_in;
+        player_saber_y <= player_saber_y_in;
       end
       if (player_saber_state_in == 0) begin
         player_saber_color <= 24'hFF_FF_FF;
@@ -99,8 +107,8 @@ module display_module (
   .nf_in(nf_in),
   .hcount_in(hcount_in),
   .vcount_in(vcount_in),
-  .x_in(player_saber_x_in),
-  .y_in(player_saber_y_in),
+  .x_in(player_saber_x),
+  .y_in(player_saber_y),
   .color_in(player_saber_color),
   .color_out(player_saber));
 

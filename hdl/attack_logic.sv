@@ -31,7 +31,7 @@ module attack_logic (
   always_ff @(posedge clk_pixel_in) begin
     if (rst_in) begin
       self_started <= 0;
-    end else if (decoded_ir_in) begin
+    end else if (decoded_ir_in == 32'h20DF_5BA4 || decoded_ir_in == 32'h20DF_5AA5) begin
       self_started <= 1'b1;
     end
   end
