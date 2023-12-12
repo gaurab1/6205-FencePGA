@@ -20,7 +20,7 @@ module image_sprite #(
   xilinx_single_port_ram_read_first #(
     .RAM_WIDTH(2),                       // Specify RAM data width
     .RAM_DEPTH(WIDTH*HEIGHT),                     // Specify RAM depth (number of entries)
-    .RAM_PERFORMANCE("HIGH_PERFORMANCE"), // Select "HIGH_PERFORMANCE" or "LOW_LATENCY" 
+    .RAM_PERFORMANCE("LOW_LATENCY"), // Select "HIGH_PERFORMANCE" or "LOW_LATENCY" 
     .INIT_FILE(`FPATH(image.mem))          // Specify name/location of RAM initialization file if using one (leave blank if not)
   ) image_memory (
     .addra(image_addr),     // Address bus, width determined from RAM_DEPTH
@@ -35,7 +35,7 @@ module image_sprite #(
   xilinx_single_port_ram_read_first #(
     .RAM_WIDTH(24),                       // Specify RAM data width
     .RAM_DEPTH(4),                     // Specify RAM depth (number of entries)
-    .RAM_PERFORMANCE("HIGH_PERFORMANCE"), // Select "HIGH_PERFORMANCE" or "LOW_LATENCY" 
+    .RAM_PERFORMANCE("LOW_LATENCY"), // Select "HIGH_PERFORMANCE" or "LOW_LATENCY" 
     .INIT_FILE(`FPATH(palette.mem))          // Specify name/location of RAM initialization file if using one (leave blank if not)
   ) pal_memory (
     .addra(pal_addr),     // Address bus, width determined from RAM_DEPTH
@@ -59,6 +59,7 @@ module image_sprite #(
   always_ff @(posedge pixel_clk_in)begin
     hcount_pipe[0] <= hcount_in;
     vcount_pipe[0] <= vcount_in;
+    image_addr <= (hcount_in - x_in) + ((vcount_in - y_in) * WIDTH);
     for (int i=1; i<4; i = i+1)begin
       hcount_pipe[i] <= hcount_pipe[i-1];
       vcount_pipe[i] <= vcount_pipe[i-1];
@@ -66,7 +67,7 @@ module image_sprite #(
   end
   // calculate rom address
   logic [$clog2(WIDTH*HEIGHT)-1:0] image_addr;
-  assign image_addr = (hcount_in - x_in) + ((vcount_in - y_in) * WIDTH);
+  // assign image_addr = (hcount_in - x_in) + ((vcount_in - y_in) * WIDTH);
 
   logic in_sprite;
   assign in_sprite = ((hcount_pipe[3] >= x_in && hcount_pipe[3] < (x_in + WIDTH)) &&

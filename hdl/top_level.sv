@@ -581,20 +581,6 @@ module top_level(
     end
   end
 
-  
-
-  // video_mux (
-  //   .bg_in(display_choice), //choose background
-  //   .target_in(target_choice), //choose target
-  //   .camera_pixel_in({r_in_pipe_1[3], g_in_pipe_1[3], b_in_pipe_1[3]}), //PS2
-  //   .camera_y_in(y_pipe), //needs (PS6)
-  //   .channel_in(selected_channel_pipe), //needs (PS5)
-  //   .thresholded_pixel_in(mask_shirt), //(PS4)
-  //   .crosshair_in({ch_red_pipe[6], ch_green_pipe[6], ch_blue_pipe[6]}), // needs (PS8)
-  //   .com_sprite_pixel_in(0), // needs (PS9) maybe?
-  //   .pixel_out({red,green,blue}) //output to tmds
-  // );
-
   // display_module plswork (
   //   .clk_in(clk_pixel),
   //   .rst_in(sys_rst),
@@ -609,12 +595,16 @@ module top_level(
   //   .player_box_ymax_in(player_data_sync.location.rect_y_2),
   //   .player_saber_x_in(player_data_sync.location.saber_x),
   //   .player_saber_y_in(player_data_sync.location.saber_y),
+  //   .player_health_in(player_data_sync.health),
+  //   .player_saber_state_in(player_data_sync.saber_state),
   //   .opponent_box_x_in((opponent_data_sync.location.rect_x_2 >> 1) + (opponent_data_sync.location.rect_x >> 1)),
   //   .opponent_box_y_in((opponent_data_sync.location.rect_y_2 >> 1) + (opponent_data_sync.location.rect_y >> 1)),
   //   .opponent_box_xmax_in(opponent_data_sync.location.rect_x_2),
   //   .opponent_box_ymax_in(opponent_data_sync.location.rect_y_2),
   //   .opponent_saber_x_in(opponent_data_sync.location.saber_x),
   //   .opponent_saber_y_in(opponent_data_sync.location.saber_y),
+  //   .opponent_health_in(opponent_data_sync.health),
+  //   .opponent_saber_state_in(opponent_data_sync.saber_state),
   //   .pixel_out({red, green, blue})
   // );
 
@@ -634,7 +624,8 @@ module top_level(
     .player_box_ymax_in(location_player.rect_y_2),
     .player_saber_x_in(location_player.saber_x),
     .player_saber_y_in(location_player.saber_y),
-    .player_health_in(5),
+    .player_saber_state_in(0),
+    .player_health_in(3),
     .opponent_box_x_in(30),
     .opponent_box_y_in(30),
     .opponent_box_xmax_in(200),
@@ -642,6 +633,7 @@ module top_level(
     .opponent_saber_x_in(50),
     .opponent_saber_y_in(300),
     .opponent_health_in(5),
+    .opponent_saber_state_in(0),
     .pixel_out({red, green, blue})
   );
 
