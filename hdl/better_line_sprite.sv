@@ -160,11 +160,11 @@ module high_line_sprite #(
         y <= y1_in;
         D <= ($signed(dx) <<< 1) - $signed(dy);
     end else begin
-        if (vcount_in == y) begin
+        if (vcount_in == y && hcount_in == x) begin
             y <= y + 1;
             if ($signed(D) > 0) begin
                 x <= (xi) ? x + 1 : x - 1;
-                D <= $signed(D) - ($signed(dy) <<< 1);
+                D <= $signed(D) + ($signed(dx) <<< 1) - ($signed(dy) <<< 1);
             end else begin
                 D <= $signed(D) + ($signed(dx) <<< 1);
             end
@@ -226,11 +226,11 @@ module line_sprite #(
     .green_out(high_color[15:8]),
     .blue_out(high_color[7:0])
   );
-  always_comb begin
-    xmax = (x1_in > x2_in) ? x1_in : x2_in;
-    ymax = (y1_in > y2_in) ? y1_in : y2_in;
-    xmin = (x1_in > x2_in) ? x2_in : x1_in;
-    ymin = (y1_in > y2_in) ? y2_in : y1_in;
+  always_ff @(posedge clk_in) begin
+    xmax <= (x1_in > x2_in) ? x1_in : x2_in;
+    ymax <= (y1_in > y2_in) ? y1_in : y2_in;
+    xmin <= (x1_in > x2_in) ? x2_in : x1_in;
+    ymin <= (y1_in > y2_in) ? y2_in : y1_in;
     high_valid = ((ymax - ymin) > (xmax - xmin)) ? 1 : 0;
   end
   always_comb begin
