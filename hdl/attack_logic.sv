@@ -14,14 +14,14 @@ module attack_logic (
     output data_t opponent_data_out,
     output logic data_out_valid
   );
-  parameter BLOCK_CODE = 32'h57E3906F;
-  parameter BLOCK_CODE_2 = 32'h57E3916E;
+  parameter BLOCK_CODE = 32'h20DF906F;
+  parameter BLOCK_CODE_2 = 32'h20DF916E;
 
   parameter LUNGE_CODE = 32'h20DF41BE;
   parameter LUNGE_CODE_2 = 32'h20DF40BF;
-  
-  parameter RELEASE_CODE = 32'h57E3C13E;
-  parameter RELEASE_CODE_2 = 32'h57E3C03F;
+
+  parameter RELEASE_CODE = 32'h20DFC13E;
+  parameter RELEASE_CODE_2 = 32'h20DFC03F;
 
   data_t fsm_player_data;
   logic player_scored;

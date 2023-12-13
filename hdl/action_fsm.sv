@@ -98,6 +98,7 @@ module action_fsm(
         case (curr_state)
           REST: begin
             player_data.saber_state <= IN_REST;
+            in_attack <= 0;
             if (block) begin
               curr_state <= BLOCK;
               player_data.saber_attack_x <= 0;
@@ -113,9 +114,6 @@ module action_fsm(
           end
           BLOCK: begin
             player_data.saber_state <= IN_BLOCK;
-            if (sabers_colliding) begin
-              player_scored <= 1'b1;
-            end
             if (released) begin
               curr_state <= REST;
             end
@@ -129,11 +127,7 @@ module action_fsm(
             player_data.saber_state <= IN_ATTACK;
             if (released && attack_intersecting) begin
               curr_state <= SCORE;
-            end else if (opponent_scored) begin
-              player_data.health <= player_data.health - 1;
-              // handle 0 case here?
-              curr_state <= RECOVER;
-            end else if (released) begin
+            end else if (sabers_colliding || released) begin
               curr_state <= RECOVER;
             end
           end
@@ -145,10 +139,16 @@ module action_fsm(
           end
           RECOVER: begin
             player_data.saber_state <= IN_REST;
+            // TODO wait for seconds
+            curr_state <= REST;
           end
         endcase
         state_started <= 0;
         state_done <= 1'b1; // assuming each state takes 1 cycle, which is def not true because of timeouts
+      end
+
+      if (opponent_scored) begin
+        player_data.health <= player_data.health - 1;
       end
 
       if (state_done) begin
