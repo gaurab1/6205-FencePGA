@@ -35,6 +35,7 @@ module display_module (
   
   logic border, display_start;
   logic [23:0] player_box, player_saber, opponent_box, opponent_saber, show_start, player_health, opponent_health;
+  logic start;
   logic [11:0] player_saber_x;
   logic [10:0] player_saber_y;
   logic [23:0] player_saber_color, opponent_saber_color;
@@ -42,14 +43,18 @@ module display_module (
   always_ff @(posedge clk_in) begin
     if (rst_in) begin
         display_start <= 1;
-        player_saber_x <= pre_saber_x_in;
-        player_saber_y <= pre_saber_y_in;
     end else begin
       if (ir_in == 32'h20DF_5BA4 || ir_in == 32'h20DF_5AA5) begin
         display_start <= 0;
+      end
+      if (display_start == 1) begin
+        player_saber_x <= pre_saber_x_in;
+        player_saber_y <= pre_saber_y_in;
+      end else begin
         player_saber_x <= player_saber_x_in;
         player_saber_y <= player_saber_y_in;
       end
+
       if (player_saber_state_in == 0) begin
         player_saber_color <= 24'hFF_FF_FF;
       end else if (player_saber_state_in == 1 || player_saber_state_in == 3) begin

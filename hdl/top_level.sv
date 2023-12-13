@@ -492,20 +492,6 @@ module top_level(
       end
     end
   end
-  // logic [10:0] player_rect_x;
-  // logic [9:0] player_rect_y;
-  // assign player_rect_x = (x_com << 1) - w_com;
-  // assign player_rect_y = (y_com << 1) - h_com;
-
-  // assign location_player.rect_x = player_rect_x;
-  // assign location_player.rect_y = player_rect_y;
-  // assign location_player.rect_x_2 = w_com;
-  // assign location_player.rect_y_2 = h_com;
-  // assign location_player.saber_x = x_com_saber;
-  // assign location_player.saber_y = y_com_saber;
-
-
-
 
   //Create Crosshair patter on center of mass:
   //0 cycle latency
@@ -597,6 +583,8 @@ module top_level(
     .player_box_ymax_in(player_data_sync.location.rect_y_2),
     .player_saber_x_in(player_data_sync.location.saber_x),
     .player_saber_y_in(player_data_sync.location.saber_y),
+    .pre_saber_x_in(location_player.saber_x),
+    .pre_saber_y_in(location_player.saber_y),
     .player_health_in(player_data_sync.health),
     .player_saber_state_in(player_data_sync.saber_state),
     .opponent_box_x_in((opponent_data_sync.location.rect_x_2 >> 1) + (opponent_data_sync.location.rect_x >> 1)),
@@ -626,6 +614,8 @@ module top_level(
   //   .player_box_ymax_in(location_player.rect_y_2),
   //   .player_saber_x_in(location_player.saber_x),
   //   .player_saber_y_in(location_player.saber_y),
+  //   .pre_saber_x_in(location_player.saber_x),
+  //   .pre_saber_y_in(location_player.saber_y),
   //   .player_saber_state_in(0),
   //   .player_health_in(3),
   //   .opponent_box_x_in(100),
