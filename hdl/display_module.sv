@@ -64,9 +64,11 @@ module display_module (
       if (player_saber_state_in == 0) begin
         player_saber_color <= 24'hFF_FF_FF;
         player_active <= 0;
-      end else if (player_saber_state_in == 1 || player_saber_state_in == 3) begin
+      end else if (player_saber_state_in == 1) begin
         player_saber_color <= 24'h00_FF_00;
         player_active <= 1;
+      end else if (player_saber_state_in == 3) begin 
+        player_saber_color <= 24'hFF_FF_00;
       end else begin
         player_saber_color <= 24'h00_00_FF;
       end
@@ -74,9 +76,11 @@ module display_module (
       if (opponent_saber_state_in == 0) begin
         opponent_saber_color <= 24'hFF_FF_FF;
         opponent_active <= 0;
-      end else if (opponent_saber_state_in == 1 || opponent_saber_state_in == 3) begin
+      end else if (opponent_saber_state_in == 1) begin
         opponent_saber_color <= 24'h00_FF_00;
         opponent_active <= 1;
+      end else if (opponent_saber_state_in == 3) begin 
+        opponent_saber_color <= 24'hFF_FF_00;
       end else begin
         opponent_saber_color <= 24'h00_00_FF;
       end
