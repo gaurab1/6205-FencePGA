@@ -88,4 +88,4 @@ module start_display(
 //     .green_out(line_color_2[15:8]),
 //     .blue_out(line_color_2[7:0])
 //   );
-// endmodule
+endmodule

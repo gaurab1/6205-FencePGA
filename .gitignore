@@ -5,3 +5,4 @@
 remote/
 *.vcd
 *.log
+build.bundle

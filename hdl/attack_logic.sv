@@ -14,8 +14,14 @@ module attack_logic (
     output data_t opponent_data_out,
     output logic data_out_valid
   );
-  parameter BLOCK_CODE = 32'hDEADBEEF;
-  parameter LUNGE_CODE = 32'h20FACADE;
+  parameter BLOCK_CODE = 32'h57E3906F;
+  parameter BLOCK_CODE_2 = 32'h57E3916E;
+
+  parameter LUNGE_CODE = 32'h20DF41BE;
+  parameter LUNGE_CODE_2 = 32'h20DF40BF;
+  
+  parameter RELEASE_CODE = 32'h57E3C13E;
+  parameter RELEASE_CODE_2 = 32'h57E3C03F;
 
   data_t fsm_player_data;
   logic player_scored;
@@ -99,8 +105,9 @@ module attack_logic (
   action_fsm action_fsm_inst(
     .clk_pixel_in(clk_pixel_in),
     .rst_in(rst_in),
-    .block_in(decoded_ir_in==BLOCK_CODE),
-    .lunge_in(decoded_ir_in==LUNGE_CODE),
+    .block_in(decoded_ir_in==BLOCK_CODE || decoded_ir_in==BLOCK_CODE_2),
+    .lunge_in(decoded_ir_in==LUNGE_CODE || decoded_ir_in==LUNGE_CODE_2),
+    .release_in(decoded_ir_in==RELEASE_CODE || decoded_ir_in==RELEASE_CODE_2),
     .ir_in_valid(decoded_ir_in_valid),
     .player_location_in(syncer_player_location),
     .opponent_data_in(opponent_data),

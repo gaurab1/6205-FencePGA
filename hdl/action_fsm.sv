@@ -7,6 +7,7 @@ module action_fsm(
     input wire rst_in,
     input wire block_in,
     input wire lunge_in,
+    input wire release_in,
     input wire ir_in_valid,
     input location_t player_location_in,
     input data_t opponent_data_in,
@@ -31,7 +32,7 @@ module action_fsm(
   logic state_started;
   logic state_done;
 
-  logic block, lunge;
+  logic block, lunge, released; // release is a keyword
 
   logic in_attack;
 
@@ -72,6 +73,7 @@ module action_fsm(
       in_attack <= 0;
       block <= 0;
       lunge <= 0;
+      released <= 0;
       state_started <= 0;
       state_done <= 0;
       player_scored <= 0;
@@ -89,6 +91,7 @@ module action_fsm(
       if (state_started == 0 && ir_in_valid) begin
         block <= block_in;
         lunge <= lunge_in;
+        released <= release_in;
       end
 
       if (state_started) begin
@@ -97,10 +100,15 @@ module action_fsm(
             player_data.saber_state <= IN_REST;
             if (block) begin
               curr_state <= BLOCK;
+              player_data.saber_attack_x <= 0;
+              player_data.saber_attack_y <= 0;
             end else if (lunge) begin
               curr_state <= LUNGE;
               player_data.saber_attack_x <= player_data.location.saber_x;
               player_data.saber_attack_y <= player_data.location.saber_y;
+            end else begin
+              player_data.saber_attack_x <= 0;
+              player_data.saber_attack_y <= 0;
             end
           end
           BLOCK: begin
@@ -108,7 +116,7 @@ module action_fsm(
             if (sabers_colliding) begin
               player_scored <= 1'b1;
             end
-            if (block == 0) begin
+            if (released) begin
               curr_state <= REST;
             end
           end
@@ -119,13 +127,13 @@ module action_fsm(
           ATTACK: begin
             in_attack <= 1'b1;
             player_data.saber_state <= IN_ATTACK;
-            if (lunge == 0 && attack_intersecting) begin
+            if (released && attack_intersecting) begin
               curr_state <= SCORE;
             end else if (opponent_scored) begin
               player_data.health <= player_data.health - 1;
               // handle 0 case here?
               curr_state <= RECOVER;
-            end else if (lunge == 0) begin
+            end else if (released) begin
               curr_state <= RECOVER;
             end
           end
