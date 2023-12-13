@@ -22,6 +22,8 @@ module display_module (
   input wire [10:0] pre_saber_y_in,
   input wire [2:0] player_health_in,
   input wire [1:0] player_saber_state_in,
+  input wire [11:0] player_attack_x_in,
+  input wire [10:0] player_attack_y_in,
   input wire [11:0] opponent_box_x_in,
   input wire [10:0] opponent_box_y_in,
   input wire [11:0] opponent_box_xmax_in,
@@ -30,19 +32,23 @@ module display_module (
   input wire [10:0] opponent_saber_y_in,
   input wire [2:0] opponent_health_in,
   input wire [1:0] opponent_saber_state_in,
+  input wire [11:0] opponent_attack_x_in,
+  input wire [10:0] opponent_attack_y_in,
   output logic [23:0] pixel_out
 );
   
   logic border, display_start;
-  logic [23:0] player_box, player_saber, opponent_box, opponent_saber, show_start, player_health, opponent_health;
+  logic [23:0] player_box, player_saber, opponent_box, opponent_saber, show_start, player_health, opponent_health, player_line, opponent_line;
   logic start;
   logic [11:0] player_saber_x;
   logic [10:0] player_saber_y;
   logic [23:0] player_saber_color, opponent_saber_color;
+  logic player_active;
 
   always_ff @(posedge clk_in) begin
     if (rst_in) begin
         display_start <= 1;
+        player_active <= 0;
     end else begin
       if (ir_in == 32'h20DF_5BA4 || ir_in == 32'h20DF_5AA5) begin
         display_start <= 0;
@@ -57,8 +63,10 @@ module display_module (
 
       if (player_saber_state_in == 0) begin
         player_saber_color <= 24'hFF_FF_FF;
+        player_active <= 0;
       end else if (player_saber_state_in == 1 || player_saber_state_in == 3) begin
         player_saber_color <= 24'h00_FF_00;
+        player_active <= 1;
       end else begin
         player_saber_color <= 24'h00_00_FF;
       end
@@ -104,6 +112,21 @@ module display_module (
     .y_in(20),
     .health(opponent_health_in),
     .color_out(opponent_health)
+  );
+
+  low_line_sprite playerline (
+    .clk_in(clk_in),
+    .rst_in(rst_in),
+    .hcount_in(hcount_in),
+    .vcount_in(vcount_in),
+    .x1_in(player_saber_x < player_attack_x_in : player_saber_x : player_attack_x_in),
+    .x2_in(player_saber_x < player_attack_x_in : player_attack_x_in : player_saber_x),
+    .y1_in(player_saber_x < player_attack_x_in : player_saber_y : player_attack_y_in),
+    .y2_in(player_saber_x < player_attack_x_in : player_attack_y_in : player_saber_y),   
+    .line_active(player_active),
+    .red_out(player_line[23:16]),
+    .green_out(player_line[15:8]),
+    .blue_out(player_line[7:0])
   );
 
   trace_display playersaber(
@@ -159,6 +182,7 @@ module display_module (
     .opponent_saber_in(opponent_saber),
     .player_health_in(player_health),
     .opponent_health_in(opponent_health),
+    .player_line_in(player_line),
     .pixel_out(pixel_out)
   );
 

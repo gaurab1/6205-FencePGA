@@ -6,8 +6,9 @@ module start_display(
     input wire [9:0] vcount_in,
     output wire [23:0] display_out
 );
-    logic [23:0] block_color, triangle_color, arrow1_color, arrow2_color, arrow3_color, arrow4_color;
+    logic [23:0] block_color, triangle_color, arrow1_color, arrow2_color, arrow3_color, arrow4_color, line_color_1, line_color_2;
     assign display_out = img_sprite_in ? img_sprite_in : arrow1_color ? arrow1_color : arrow2_color ? arrow2_color : arrow3_color ? arrow3_color: arrow4_color? arrow4_color: block_color ? block_color : 0;
+    // assign display_out = line_color_1 ? line_color_1 : line_color_2;
     fixed_block_sprite #(.HEIGHT(100), .WIDTH(200), .COLOR(24'hF4_63_05)) playbutton(
     .hcount_in(hcount_in),
     .vcount_in(vcount_in),
@@ -58,4 +59,33 @@ module start_display(
     .blue_out(arrow4_color[7:0])
   );
 
-endmodule
+//   better_line lol1 (
+//     .clk_in(clk_in),
+//     .rst_in(rst_in),
+//     .hcount_in(hcount_in),
+//     .vcount_in(vcount_in),
+//     .x1_in(10),
+//     .x2_in(200),
+//     .y1_in(200),
+//     .y2_in(300),
+//     //.line_active(1),
+//     .red_out(line_color_1[23:16]),
+//     .green_out(line_color_1[15:8]),
+//     .blue_out(line_color_1[7:0])
+//   );
+
+//   better_line lol2 (
+//     .clk_in(clk_in),
+//     .rst_in(rst_in),
+//     .hcount_in(hcount_in),
+//     .vcount_in(vcount_in),
+//     .x1_in(0),
+//     .x2_in(960),
+//     .y1_in(0),
+//     .y2_in(640),
+//     //.line_active(1),
+//     .red_out(line_color_2[23:16]),
+//     .green_out(line_color_2[15:8]),
+//     .blue_out(line_color_2[7:0])
+//   );
+// endmodule

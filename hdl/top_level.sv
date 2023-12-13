@@ -587,6 +587,8 @@ module top_level(
     .pre_saber_y_in(location_player.saber_y),
     .player_health_in(player_data_sync.health),
     .player_saber_state_in(player_data_sync.saber_state),
+    .player_attack_x_in(player_data_sync.saber_attack_x),
+    .player_attack_y_in(player_data_sync.saber_attack_y),
     .opponent_box_x_in((opponent_data_sync.location.rect_x_2 >> 1) + (opponent_data_sync.location.rect_x >> 1)),
     .opponent_box_y_in((opponent_data_sync.location.rect_y_2 >> 1) + (opponent_data_sync.location.rect_y >> 1)),
     .opponent_box_xmax_in(opponent_data_sync.location.rect_x_2),
@@ -595,6 +597,8 @@ module top_level(
     .opponent_saber_y_in(opponent_data_sync.location.saber_y),
     .opponent_health_in(opponent_data_sync.health),
     .opponent_saber_state_in(opponent_data_sync.saber_state),
+    .opponent_attack_x_in(opponent_data_sync.saber_attack_x),
+    .opponent_attack_y_in(opponent_data_sync.saber_attack_y),
     .pixel_out({red, green, blue})
   );
 
@@ -618,6 +622,8 @@ module top_level(
   //   .pre_saber_y_in(location_player.saber_y),
   //   .player_saber_state_in(0),
   //   .player_health_in(3),
+  //   .player_attack_x_in(0),
+  //   .player_attack_y_in(0),
   //   .opponent_box_x_in(100),
   //   .opponent_box_y_in(150),
   //   .opponent_box_xmax_in(150),
@@ -626,6 +632,8 @@ module top_level(
   //   .opponent_saber_y_in(300),
   //   .opponent_health_in(4),
   //   .opponent_saber_state_in(0),
+  //   .opponent_attack_x_in(0),
+  //   .opponent_attack_y_in(0),
   //   .pixel_out({red, green, blue})
   // );
 
