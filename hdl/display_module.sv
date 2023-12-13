@@ -73,8 +73,10 @@ module display_module (
 
       if (opponent_saber_state_in == 0) begin
         opponent_saber_color <= 24'hFF_FF_FF;
+        opponent_active <= 0;
       end else if (opponent_saber_state_in == 1 || opponent_saber_state_in == 3) begin
         opponent_saber_color <= 24'h00_FF_00;
+        opponent_active <= 1;
       end else begin
         opponent_saber_color <= 24'h00_00_FF;
       end
@@ -142,16 +144,30 @@ module display_module (
     .color_out(player_line)
   );
 
+  line_sprite opponentline (
+    .clk_in(clk_in),
+    .rst_in(rst_in),
+    .hcount_in(hcount_in),
+    .vcount_in(vcount_in),
+    .x1_in(opponent_attack_x_in),
+    .x2_in(opponent_saber_x_in),
+    .y1_in(opponent_attack_y_in),
+    .y2_in(opponent_saber_y_in),   
+    .line_active(opponent_active),
+    .color_out(opponent_line)
+  );
+
   trace_display playersaber(
-  .clk_in(clk_in),
-  .rst_in(rst_in),
-  .nf_in(nf_in),
-  .hcount_in(hcount_in),
-  .vcount_in(vcount_in),
-  .x_in(player_saber_x),
-  .y_in(player_saber_y),
-  .color_in(player_saber_color),
-  .color_out(player_saber));
+    .clk_in(clk_in),
+    .rst_in(rst_in),
+    .nf_in(nf_in),
+    .hcount_in(hcount_in),
+    .vcount_in(vcount_in),
+    .x_in(player_saber_x),
+    .y_in(player_saber_y),
+    .color_in(player_saber_color),
+    .color_out(player_saber)
+  );
 
   fixed_block_sprite opponentsaber(
     .hcount_in(hcount_in),
@@ -196,6 +212,7 @@ module display_module (
     .player_health_in(player_health),
     .opponent_health_in(opponent_health),
     .player_line_in(player_line),
+    .opponent_line_in(opponent_line),
     .pixel_out(pixel_out)
   );
 

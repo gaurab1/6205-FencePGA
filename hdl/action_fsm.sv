@@ -145,10 +145,9 @@ module action_fsm(
         endcase
         state_started <= 0;
         state_done <= 1'b1; // assuming each state takes 1 cycle, which is def not true because of timeouts
-      end
-
-      if (opponent_scored) begin
-        player_data.health <= player_data.health - 1;
+        if (opponent_scored) begin
+          player_data.health <= player_data.health - 1;
+        end
       end
 
       if (state_done) begin

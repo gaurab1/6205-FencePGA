@@ -135,7 +135,7 @@ module high_line_sprite #(
   );
 
   logic signed [11:0] dx, dy, D;
-  logic yi;
+  logic xi;
   logic [10:0] x;
   logic [9:0] y;
   assign dy = $signed(y2_in) - $signed(y1_in);
@@ -226,11 +226,11 @@ module line_sprite #(
     .green_out(high_color[15:8]),
     .blue_out(high_color[7:0])
   );
-  always_ff @(posedge clk_in) begin
-    xmax <= (x1_in > x2_in) ? x1_in : x2_in;
-    ymax <= (y1_in > y2_in) ? y1_in : y2_in;
-    xmin <= (x1_in > x2_in) ? x2_in : x1_in;
-    ymin <= (y1_in > y2_in) ? y2_in : y1_in;
+  always_comb begin
+    xmax = (x1_in > x2_in) ? x1_in : x2_in;
+    ymax = (y1_in > y2_in) ? y1_in : y2_in;
+    xmin = (x1_in > x2_in) ? x2_in : x1_in;
+    ymin = (y1_in > y2_in) ? y2_in : y1_in;
     high_valid = ((ymax - ymin) > (xmax - xmin)) ? 1 : 0;
   end
   always_comb begin
