@@ -52,7 +52,7 @@ module fixed_block_sprite #(
 endmodule
 
 module fixed_color_block_sprite #(
-  parameter WIDTH=15, HEIGHT=15)(
+  parameter WIDTH=14, HEIGHT=14)(
   input wire [10:0] hcount_in,
   input wire [9:0] vcount_in,
   input wire [10:0] x_in,

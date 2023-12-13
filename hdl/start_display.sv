@@ -8,7 +8,6 @@ module start_display(
 );
     logic [23:0] block_color, triangle_color, arrow1_color, arrow2_color, arrow3_color, arrow4_color;
     assign display_out = img_sprite_in ? img_sprite_in : arrow1_color ? arrow1_color : arrow2_color ? arrow2_color : arrow3_color ? arrow3_color: arrow4_color? arrow4_color: block_color ? block_color : 0;
-
     fixed_block_sprite #(.HEIGHT(100), .WIDTH(200), .COLOR(24'hF4_63_05)) playbutton(
     .hcount_in(hcount_in),
     .vcount_in(vcount_in),
