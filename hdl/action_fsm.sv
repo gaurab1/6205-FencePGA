@@ -20,9 +20,9 @@ module action_fsm(
   );
 
   localparam IN_REST = 2'b00;
-  localparam IN_LUNGE = 2'b01;
+  localparam IN_ATTACK = 2'b01;
   localparam IN_BLOCK = 2'b10;
-  localparam IN_ATTACK = 2'b11;
+  localparam IN_RECOVER = 2'b11;
 
   data_t player_data;
   logic player_scored;
@@ -41,7 +41,6 @@ module action_fsm(
   saber_collision_detector coll_inst(
     .clk_pixel_in(clk_pixel_in),
     .rst_in(rst_in),
-    .is_attacking(in_attack),
     .opponent_is_blocking(opponent_data.saber_state==IN_BLOCK),
     .player_x(player_data.location.saber_x),
     .player_y(player_data.location.saber_y),
@@ -88,7 +87,7 @@ module action_fsm(
         state_started <= 1'b1;
       end
 
-      if (state_started == 0 && ir_in_valid) begin
+      if (ir_in_valid) begin
         block <= block_in;
         lunge <= lunge_in;
         released <= release_in;
@@ -114,31 +113,35 @@ module action_fsm(
           end
           BLOCK: begin
             player_data.saber_state <= IN_BLOCK;
-            if (released) begin
+            if (block == 0) begin
               curr_state <= REST;
             end
           end
           LUNGE: begin
-            player_data.saber_state <= IN_LUNGE;
+            player_data.saber_state <= IN_ATTACK;
             curr_state <= ATTACK;
           end
           ATTACK: begin
             in_attack <= 1'b1;
-            player_data.saber_state <= IN_ATTACK;
             if (released && attack_intersecting) begin
               curr_state <= SCORE;
-            end else if (sabers_colliding || released) begin
+            end else if (sabers_colliding) begin
+              if (ir_in_valid == 0) begin
+                lunge <= 0;
+              end
+              curr_state <= RECOVER;
+            end else if (released) begin
               curr_state <= RECOVER;
             end
           end
           SCORE: begin
-            player_data.saber_state <= IN_REST;
+            player_data.saber_state <= IN_RECOVER;
             // Increment score
             player_scored <= 1'b1;
             curr_state <= RECOVER;
           end
           RECOVER: begin
-            player_data.saber_state <= IN_REST;
+            player_data.saber_state <= IN_RECOVER;
             // TODO wait for seconds
             curr_state <= REST;
           end
