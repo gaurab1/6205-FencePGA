@@ -98,7 +98,10 @@ module low_line_sprite #(
         y <= y1_in;
         D <= ($signed(dy) <<< 1) - $signed(dx);
     end else begin
-        if (hcount_in == x) begin
+        if (hcount_in == x && vcount_in == y) begin
+            red_out <= line_active ? COLOR[23:16] : 0;
+            green_out <= line_active ? COLOR[15:8] : 0;
+            blue_out <= line_active ? COLOR[7:0] : 0;
             x <= x + 1;
             if ($signed(D) > 0) begin
                 y <= (yi) ? y + 1 : y - 1;
@@ -106,6 +109,10 @@ module low_line_sprite #(
             end else begin
                 D <= $signed(D) + ($signed(dy) <<< 1);
             end
+        end else begin
+            red_out <= 0;
+            green_out <= 0;
+            blue_out <= 0;
         end
         if (x > x2_in) begin
             x <= x1_in;
@@ -142,17 +149,17 @@ module high_line_sprite #(
   assign dx = (x2_in > x1_in) ? $signed(x2_in) - $signed(x1_in) : $signed(x1_in) - $signed(x2_in);
   assign xi = (x2_in > x1_in) ? 1 : 0;
 
-  always_comb begin
-    if (hcount_in == x && vcount_in == y && line_active == 1) begin
-        red_out = COLOR[23:16];
-        green_out = COLOR[15:8];
-        blue_out = COLOR[7:0];
-    end else begin
-        red_out = 0;
-        green_out = 0;
-        blue_out = 0;
-    end
-  end
+//   always_comb begin
+//     if (hcount_in == x && vcount_in == y && line_active == 1) begin
+//         red_out = COLOR[23:16];
+//         green_out = COLOR[15:8];
+//         blue_out = COLOR[7:0];
+//     end else begin
+//         red_out = 0;
+//         green_out = 0;
+//         blue_out = 0;
+//     end
+//   end
 
   always_ff @(posedge clk_in) begin
     if (rst_in) begin
@@ -161,6 +168,9 @@ module high_line_sprite #(
         D <= ($signed(dx) <<< 1) - $signed(dy);
     end else begin
         if (vcount_in == y && hcount_in == x) begin
+            red_out <= line_active ? COLOR[23:16]: 0;
+            green_out <= line_active ? COLOR[15:8]: 0;
+            blue_out <= line_active ? COLOR[7:0]: 0;
             y <= y + 1;
             if ($signed(D) > 0) begin
                 x <= (xi) ? x + 1 : x - 1;
@@ -168,6 +178,10 @@ module high_line_sprite #(
             end else begin
                 D <= $signed(D) + ($signed(dx) <<< 1);
             end
+        end else begin
+            red_out <= 0;
+            green_out <= 0;
+            blue_out <= 0;
         end
         if (y > y2_in) begin
             x <= x1_in;

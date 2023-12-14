@@ -157,6 +157,7 @@ module transparent_triangle_sprite #(COLOR=24'hFF_FF_FF)(
     .x2_in(x2_in),
     .y1_in(y1_in),
     .y2_in(y2_in),
+    .line_active(1),
     .red_out(red1),
     .green_out(green1),
     .blue_out(blue1));
@@ -170,6 +171,7 @@ module transparent_triangle_sprite #(COLOR=24'hFF_FF_FF)(
     .x2_in(x2_in),
     .y1_in(y3_in),
     .y2_in(y2_in),
+    .line_active(1),
     .red_out(red2),
     .green_out(green2),
     .blue_out(blue2));
@@ -183,6 +185,7 @@ module transparent_triangle_sprite #(COLOR=24'hFF_FF_FF)(
     .x2_in(x3_in),
     .y1_in(y1_in),
     .y2_in(y3_in),
+    .line_active(1),
     .red_out(red3),
     .green_out(green3),
     .blue_out(blue3));
@@ -210,6 +213,32 @@ module minmax_block_sprite #(COLOR=24'hFF_00_00)(
       red_out = COLOR[23:16];
       green_out = COLOR[15:8];
       blue_out = COLOR[7:0];
+    end else begin
+      red_out = 0;
+      green_out = 0;
+      blue_out = 0;
+    end
+  end
+endmodule
+
+module color_com_block_sprite #(HALF_WIDTH=7, HALF_HEIGHT=7) (
+  input wire [10:0] hcount_in,
+  input wire [9:0] vcount_in,
+  input wire [11:0] x_in,
+  input wire [10:0]  y_in,
+  input wire [23:0] color_in,
+  output logic [7:0] red_out,
+  output logic [7:0] green_out,
+  output logic [7:0] blue_out);
+
+  logic in_sprite;
+  assign in_sprite = ((((hcount_in + HALF_WIDTH) >= (x_in)) && hcount_in < (x_in + HALF_WIDTH)) &&
+                        (((vcount_in + HALF_HEIGHT) >= (y_in)) && vcount_in < (y_in + HALF_HEIGHT)));
+  always_comb begin
+    if (in_sprite)begin
+      red_out = color_in;
+      green_out = color_in;
+      blue_out = color_in;
     end else begin
       red_out = 0;
       green_out = 0;
