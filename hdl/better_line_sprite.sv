@@ -98,10 +98,7 @@ module low_line_sprite #(
         y <= y1_in;
         D <= ($signed(dy) <<< 1) - $signed(dx);
     end else begin
-        if (hcount_in == x && vcount_in == y) begin
-            red_out <= line_active ? COLOR[23:16] : 0;
-            green_out <= line_active ? COLOR[15:8] : 0;
-            blue_out <= line_active ? COLOR[7:0] : 0;
+        if (hcount_in == x) begin
             x <= x + 1;
             if ($signed(D) > 0) begin
                 y <= (yi) ? y + 1 : y - 1;
@@ -109,10 +106,6 @@ module low_line_sprite #(
             end else begin
                 D <= $signed(D) + ($signed(dy) <<< 1);
             end
-        end else begin
-            red_out <= 0;
-            green_out <= 0;
-            blue_out <= 0;
         end
         if (x > x2_in) begin
             x <= x1_in;
