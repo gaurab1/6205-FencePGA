@@ -64,7 +64,7 @@ module end_display_win (
     .blue_out(arrow1_color[7:0])
   );
 
-  fixed_block_sprite #(.HEIGHT(100), .WIDTH(20)) arrow2(
+  fixed_block_sprite #(.HEIGHT(50), .WIDTH(20)) arrow2(
     .hcount_in(hcount_in),
     .vcount_in(vcount_in),
     .x_in(470),
