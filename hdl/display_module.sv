@@ -5,6 +5,7 @@ module display_module (
   input wire clk_in,
   input wire rst_in,
   input wire [23:0] img_sprite_in,
+  input wire attack_valid_in,
   input wire [31:0] ir_in,
   input wire start_screen,
   input wire camera_sw,
@@ -39,7 +40,7 @@ module display_module (
   
   logic border, display_start;
   logic [23:0] player_box, player_saber, opponent_box, opponent_saber, show_start, player_health, opponent_health, player_line, opponent_line, lose_color, win_color;
-  logic start, end_lose, end_win;
+  logic start, end_lose, end_win, ever_attack;
   logic [11:0] player_saber_x;
   logic [10:0] player_saber_y;
   logic [23:0] player_saber_color, opponent_saber_color;
@@ -51,7 +52,11 @@ module display_module (
         player_active <= 0;
         end_lose <= 0;
         end_win <= 0;
+        ever_attack <= 0;
     end else begin
+      if (attack_valid_in) begin
+        ever_attack <= 1;
+      end
       if (ir_in == 32'h20DF_5BA4 || ir_in == 32'h20DF_5AA5) begin
         display_start <= 0;
       end
@@ -89,9 +94,9 @@ module display_module (
         opponent_saber_color <= 24'h00_00_FF;
       end
 
-      if (player_health_in == 0 && opponent_health_in != 0 && display_start == 0) begin
+      if (player_health_in == 0 && opponent_health_in != 0 && display_start == 0 && ever_attack == 1) begin
         end_lose <= 1;
-      end else if (opponent_health_in == 0 && player_health_in != 0 && display_start == 0) begin
+      end else if (opponent_health_in == 0 && player_health_in != 0 && display_start == 0 && ever_attack == 1) begin
         end_win <= 1;
       end
     end

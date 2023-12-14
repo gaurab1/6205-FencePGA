@@ -574,6 +574,7 @@ module top_level(
     .clk_in(clk_pixel),
     .rst_in(sys_rst),
     .img_sprite_in({img_red_pipe[2], img_green_pipe[2], img_blue_pipe[2]}),
+    .attack_valid_in(attack_data_valid),
     .ir_in(ir_out),
     .camera_sw(sw[4]),
     .camera_pixel_in({r_in_pipe_1[3], g_in_pipe_1[3], b_in_pipe_1[3]}),
