@@ -93,7 +93,7 @@ module top_level(
   logic [7:0] lower_threshold;
   logic [7:0] upper_threshold;
   logic mask_shirt; //Whether or not thresholded pixel is 1 or 0
-  logic mask_saber;
+  logic mask_saber_green, mask_saber_red;
 
   // ir output
   logic [31:0] ir_out;
@@ -386,7 +386,16 @@ module top_level(
      .pixel_in(g_in_pipe[2]),
      .lower_bound_in(8'b01110000),
      .upper_bound_in(8'b10100000),
-     .mask_out(mask_saber) //single bit if pixel within mask.
+     .mask_out(mask_saber_green) //single bit if pixel within mask.
+  );
+
+  threshold(
+     .clk_in(clk_pixel),
+     .rst_in(sys_rst),
+     .pixel_in(r_in_pipe[2]),
+     .lower_bound_in(8'b01110000),
+     .upper_bound_in(8'b10100000),
+     .mask_out(mask_saber_red) //single bit if pixel within mask.
   );
 
   seven_segment_controller(.clk_in(clk_pixel),
@@ -437,7 +446,7 @@ module top_level(
     .rst_in(sys_rst),
     .x_in(h_count_pipe[6]),  // (PS3)
     .y_in(v_count_pipe[6]), // (PS3)
-    .valid_in(mask_saber), //aka threshold
+    .valid_in(mask_saber_green && (~mask_saber_red)), //aka threshold
     .tabulate_in((new_frame_pipe[6])),
     .x_out(x_com_calc_saber),
     .y_out(y_com_calc_saber),
