@@ -38,8 +38,8 @@ module display_module (
 );
   
   logic border, display_start;
-  logic [23:0] player_box, player_saber, opponent_box, opponent_saber, show_start, player_health, opponent_health, player_line, opponent_line, lose_color;
-  logic start;
+  logic [23:0] player_box, player_saber, opponent_box, opponent_saber, show_start, player_health, opponent_health, player_line, opponent_line, lose_color, win_color;
+  logic start, end_lose, end_win;
   logic [11:0] player_saber_x;
   logic [10:0] player_saber_y;
   logic [23:0] player_saber_color, opponent_saber_color;
@@ -49,6 +49,8 @@ module display_module (
     if (rst_in) begin
         display_start <= 1;
         player_active <= 0;
+        end_lose <= 0;
+        end_win <= 0;
     end else begin
       if (ir_in == 32'h20DF_5BA4 || ir_in == 32'h20DF_5AA5) begin
         display_start <= 0;
@@ -69,6 +71,7 @@ module display_module (
         player_active <= 1;
       end else if (player_saber_state_in == 3) begin 
         player_saber_color <= 24'hFF_FF_00;
+        player_active <= 0;
       end else begin
         player_saber_color <= 24'h00_00_FF;
       end
@@ -81,8 +84,15 @@ module display_module (
         opponent_active <= 1;
       end else if (opponent_saber_state_in == 3) begin 
         opponent_saber_color <= 24'hFF_FF_00;
+        opponent_active <= 0;
       end else begin
         opponent_saber_color <= 24'h00_00_FF;
+      end
+
+      if (player_health_in == 0) begin
+        end_lose <= 1;
+      end else if (opponent_health_in == 0) begin
+        end_win <= 1;
       end
     end
   end
@@ -196,6 +206,12 @@ module display_module (
     .color_out(lose_color)
   );
 
+  end_display_win W (
+    .hcount_in(hcount_in),
+    .vcount_in(vcount_in),
+    .color_out(win_color)
+  );
+
   display_module_mux lol (
     .clk_in(clk_in),
     .game_border_in(border),
@@ -210,7 +226,10 @@ module display_module (
     .opponent_health_in(opponent_health),
     .player_line_in(player_line),
     .opponent_line_in(opponent_line),
+    .end_lose_in(end_lose),
     .end_lose_screen(lose_color),
+    .end_win_in(end_win),
+    .end_win_screen(win_color),
     .pixel_out(pixel_out)
   );
 
