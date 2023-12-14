@@ -159,6 +159,9 @@ module high_line_sprite #(
         x <= x1_in;
         y <= y1_in;
         D <= ($signed(dx) <<< 1) - $signed(dy);
+        red_out <= 0;
+        green_out <= 0;
+        blue_out <= 0;
     end else begin
         if (vcount_in == y && hcount_in == x) begin
             red_out <= line_active ? COLOR[23:16]: 0;
@@ -211,8 +214,8 @@ module line_sprite #(
     .vcount_in(vcount_in),
     .x1_in(xmin),
     .x2_in(xmax),
-    .y1_in((x1_in == xmin) ? y1_in : y2_in),
-    .y2_in((x2_in == xmax) ? y2_in : y1_in),
+    .y1_in((x1_in < x2_in) ? y1_in : y2_in),
+    .y2_in((x1_in < x2_in) ? y2_in : y1_in),
     .line_active(line_active),
     .red_out(low_color[23:16]),
     .green_out(low_color[15:8]),
@@ -224,8 +227,8 @@ module line_sprite #(
     .rst_in(rst_in),
     .hcount_in(hcount_in),
     .vcount_in(vcount_in),
-    .x1_in((y1_in == ymin) ? x1_in : x2_in),
-    .x2_in((y2_in == ymax) ? x2_in : x1_in),
+    .x1_in((y1_in < y2_in) ? x1_in : x2_in),
+    .x2_in((y1_in < y2_in) ? x2_in : x1_in),
     .y1_in(ymin),
     .y2_in(ymax),
     .line_active(line_active),

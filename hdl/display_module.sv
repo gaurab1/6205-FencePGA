@@ -41,12 +41,14 @@ module display_module (
   logic border, display_start;
   logic [23:0] player_box, player_saber, opponent_box, opponent_saber, show_start, player_health, opponent_health, player_line, opponent_line, lose_color, win_color;
   logic start, end_lose, end_win, ever_attack;
-  logic [11:0] player_saber_x;
-  logic [10:0] player_saber_y;
+  logic [11:0] player_saber_x, opponent_saber_x;
+  logic [10:0] player_saber_y, opponent_saber_y;
   logic [23:0] player_saber_color, opponent_saber_color;
   logic player_active, opponent_active;
 
   always_ff @(posedge clk_in) begin
+    opponent_saber_x <= opponent_saber_x_in;
+    opponent_saber_y <= opponent_saber_y_in;
     if (rst_in) begin
         display_start <= 1;
         player_active <= 0;
@@ -155,9 +157,9 @@ module display_module (
     .hcount_in(hcount_in),
     .vcount_in(vcount_in),
     .x1_in(opponent_attack_x_in),
-    .x2_in(opponent_saber_x_in),
+    .x2_in(opponent_saber_x),
     .y1_in(opponent_attack_y_in),
-    .y2_in(opponent_saber_y_in),   
+    .y2_in(opponent_saber_y),   
     .line_active(opponent_active),
     .color_out(opponent_line)
   );
