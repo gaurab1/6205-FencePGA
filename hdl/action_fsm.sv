@@ -37,6 +37,7 @@ module action_fsm(
   logic block, lunge, released; // because release is a keyword
 
   logic [5:0] second_counter;
+  logic [9:0] four_second_counter;
 
   logic in_attack;
 
@@ -84,6 +85,7 @@ module action_fsm(
       opponent_scored <= 0;
       opponent_data <= 89'b101_00000000000_0000000000_00000010000_0000010000_10000000000_1000000000_00_10101010101_0101010101;
       second_counter <= 0;
+      four_second_counter <= 0;
     end else begin
       if (syncer_in_valid) begin
         player_data.location <= player_location_in;
@@ -118,8 +120,12 @@ module action_fsm(
           end
           BLOCK: begin
             player_data.saber_state <= IN_BLOCK;
-            if (released || lunge) begin
+
+            if (released || lunge || four_second_counter >= 4*FPS) begin
+              four_second_counter <= 0;
               curr_state <= REST;
+            end else begin
+              four_second_counter <= four_second_counter + 1;
             end
           end
           LUNGE: begin
