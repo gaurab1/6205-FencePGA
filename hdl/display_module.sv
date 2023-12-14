@@ -43,7 +43,7 @@ module display_module (
   logic [11:0] player_saber_x;
   logic [10:0] player_saber_y;
   logic [23:0] player_saber_color, opponent_saber_color;
-  logic player_active;
+  logic player_active, opponent_active;
 
   always_ff @(posedge clk_in) begin
     if (rst_in) begin

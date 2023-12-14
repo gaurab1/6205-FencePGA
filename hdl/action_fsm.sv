@@ -24,6 +24,8 @@ module action_fsm(
   localparam IN_BLOCK = 2'b10;
   localparam IN_RECOVER = 2'b11;
 
+  localparam FPS = 60;
+
   data_t player_data;
   logic player_scored;
   data_t opponent_data;
@@ -32,7 +34,9 @@ module action_fsm(
   logic state_started;
   logic state_done;
 
-  logic block, lunge, released; // release is a keyword
+  logic block, lunge, released; // because release is a keyword
+
+  logic [5:0] second_counter;
 
   logic in_attack;
 
@@ -79,6 +83,7 @@ module action_fsm(
       player_data <= 89'b101_00000000000_0000000000_00000010000_0000010000_10000000000_1000000000_00_10101010101_0101010101;
       opponent_scored <= 0;
       opponent_data <= 89'b101_00000000000_0000000000_00000010000_0000010000_10000000000_1000000000_00_10101010101_0101010101;
+      second_counter <= 0;
     end else begin
       if (syncer_in_valid) begin
         player_data.location <= player_location_in;
@@ -113,7 +118,7 @@ module action_fsm(
           end
           BLOCK: begin
             player_data.saber_state <= IN_BLOCK;
-            if (block == 0) begin
+            if (released || lunge) begin
               curr_state <= REST;
             end
           end
@@ -130,30 +135,34 @@ module action_fsm(
                 lunge <= 0;
               end
               curr_state <= RECOVER;
-            end else if (released) begin
+            end else if (released || block) begin
               curr_state <= RECOVER;
             end
           end
           SCORE: begin
             player_data.saber_state <= IN_RECOVER;
-            // Increment score
             player_scored <= 1'b1;
             curr_state <= RECOVER;
           end
           RECOVER: begin
             player_data.saber_state <= IN_RECOVER;
-            // TODO wait for seconds
-            curr_state <= REST;
+            if (second_counter >= FPS) begin
+              second_counter <= 0;
+              curr_state <= REST;
+            end else begin
+              second_counter <= second_counter + 1;
+            end
           end
         endcase
         state_started <= 0;
-        state_done <= 1'b1; // assuming each state takes 1 cycle, which is def not true because of timeouts
-        if (opponent_scored) begin
-          player_data.health <= player_data.health - 1;
-        end
+        state_done <= 1'b1;
       end
 
       if (state_done) begin
+        if (opponent_scored) begin
+          player_data.health <= player_data.health - 1;
+        end
+
         player_data_out <= player_data;
         opponent_data_out <= opponent_data;
         player_scored_out <= player_scored;
