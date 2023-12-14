@@ -89,9 +89,9 @@ module display_module (
         opponent_saber_color <= 24'h00_00_FF;
       end
 
-      if (player_health_in == 0 && opponent_health != 0 display_start == 0) begin
+      if (player_health_in == 0 && opponent_health_in != 0 && display_start == 0) begin
         end_lose <= 1;
-      end else if (opponent_health_in == 0 && player_health != 0 && display_start == 0) begin
+      end else if (opponent_health_in == 0 && player_health_in != 0 && display_start == 0) begin
         end_win <= 1;
       end
     end

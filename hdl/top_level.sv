@@ -526,7 +526,10 @@ module top_level(
   data_t player_data_sync, opponent_data_sync;
 
   always_ff @(posedge clk_pixel) begin
-    if (attack_data_valid) begin
+    if (sys_rst) begin
+      player_data_sync.health <= 3'b101;
+      opponent_data_sync.health <= 3'b101;
+    end else if (attack_data_valid) begin
       player_data_sync <= player_data;
       opponent_data_sync <= opponent_data;
     end
