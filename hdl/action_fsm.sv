@@ -123,6 +123,9 @@ module action_fsm(
 
             if (released || lunge || four_second_counter >= 4*FPS) begin
               four_second_counter <= 0;
+              if (ir_in_valid == 0) begin
+                block <= 0;
+              end
               curr_state <= REST;
             end else begin
               four_second_counter <= four_second_counter + 1;
