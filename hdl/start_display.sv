@@ -73,19 +73,4 @@ module start_display(
 //     .green_out(line_color_1[15:8]),
 //     .blue_out(line_color_1[7:0])
 //   );
-
-//   better_line lol2 (
-//     .clk_in(clk_in),
-//     .rst_in(rst_in),
-//     .hcount_in(hcount_in),
-//     .vcount_in(vcount_in),
-//     .x1_in(0),
-//     .x2_in(960),
-//     .y1_in(0),
-//     .y2_in(640),
-//     //.line_active(1),
-//     .red_out(line_color_2[23:16]),
-//     .green_out(line_color_2[15:8]),
-//     .blue_out(line_color_2[7:0])
-//   );
 endmodule

@@ -15,10 +15,11 @@ module display_module_mux (
   input wire [23:0] opponent_health_in,
   input wire [23:0] player_line_in,
   input wire [23:0] opponent_line_in,
+  input wire [23:0] end_lose_screen,
   output logic [23:0] pixel_out
 );
  // assign pixel_out = 24'hFFFFFF;
- logic [23:0] game_border_delayed, camera_pixel_delayed, start_display_delayed, start_delayed, player_box_delayed, opponent_box_delayed, player_saber_delayed, opponent_saber_delayed, player_health_delayed, opponent_health_delayed, player_line_delayed, opponent_line_delayed;
+ logic [23:0] game_border_delayed, camera_pixel_delayed, start_display_delayed, start_delayed, player_box_delayed, opponent_box_delayed, player_saber_delayed, opponent_saber_delayed, player_health_delayed, opponent_health_delayed, player_line_delayed, opponent_line_delayed, lose_delay;
  always_ff @(posedge clk_in) begin
   game_border_delayed <= game_border_in;
   camera_pixel_delayed <= camera_pixel_in;
@@ -33,7 +34,7 @@ module display_module_mux (
   player_line_delayed <= player_line_in;
   opponent_line_delayed <= opponent_line_in;
  end
- // assign pixel_out = game_border_delayed ? 24'hFFFFFF: player_saber_delayed ? player_saber_delayed : player_line_delayed ? player_line_delayed : 0;
+ // assign pixel_out = end_lose_screen;
  assign pixel_out = game_border_delayed ? 24'hFFFFFF: player_saber_delayed ? player_saber_delayed : start_display_delayed ? (start_delayed? start_delayed: 0) : player_health_delayed ? player_health_delayed : opponent_health_delayed ? opponent_health_delayed : player_line_delayed ? player_line_delayed : opponent_line_delayed ? opponent_line_delayed : opponent_saber_delayed ? opponent_saber_delayed : (player_box_delayed != 0) ? player_box_delayed : opponent_box_delayed ? opponent_box_delayed : camera_pixel_delayed ? camera_pixel_delayed : 0;
 endmodule
 

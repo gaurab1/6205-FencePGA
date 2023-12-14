@@ -38,7 +38,7 @@ module display_module (
 );
   
   logic border, display_start;
-  logic [23:0] player_box, player_saber, opponent_box, opponent_saber, show_start, player_health, opponent_health, player_line, opponent_line;
+  logic [23:0] player_box, player_saber, opponent_box, opponent_saber, show_start, player_health, opponent_health, player_line, opponent_line, lose_color;
   logic start;
   logic [11:0] player_saber_x;
   logic [10:0] player_saber_y;
@@ -121,20 +121,6 @@ module display_module (
     .color_out(opponent_health)
   );
 
-  // low_line_sprite playerline (
-  //   .clk_in(clk_in),
-  //   .rst_in(rst_in),
-  //   .hcount_in(hcount_in),
-  //   .vcount_in(vcount_in),
-  //   .x1_in(player_saber_x < player_attack_x_in : player_saber_x : player_attack_x_in),
-  //   .x2_in(player_saber_x < player_attack_x_in : player_attack_x_in : player_saber_x),
-  //   .y1_in(player_saber_x < player_attack_x_in : player_saber_y : player_attack_y_in),
-  //   .y2_in(player_saber_x < player_attack_x_in : player_attack_y_in : player_saber_y),   
-  //   .line_active(player_active),
-  //   .red_out(player_line[23:16]),
-  //   .green_out(player_line[15:8]),
-  //   .blue_out(player_line[7:0])
-  // );
   line_sprite playerline (
     .clk_in(clk_in),
     .rst_in(rst_in),
@@ -173,11 +159,12 @@ module display_module (
     .color_out(player_saber)
   );
 
-  fixed_block_sprite opponentsaber(
+  fixed_color_block_sprite opponentsaber(
     .hcount_in(hcount_in),
     .vcount_in(vcount_in),
     .x_in(opponent_saber_x_in),
     .y_in(opponent_saber_y_in),
+    .color_in(opponent_saber_color),
     .red_out(opponent_saber[23:16]),
     .green_out(opponent_saber[15:8]),
     .blue_out(opponent_saber[7:0])
@@ -203,6 +190,12 @@ module display_module (
     .display_out(show_start)
   );
 
+  end_display_lose L (
+    .hcount_in(hcount_in),
+    .vcount_in(vcount_in),
+    .color_out(lose_color)
+  );
+
   display_module_mux lol (
     .clk_in(clk_in),
     .game_border_in(border),
@@ -217,6 +210,7 @@ module display_module (
     .opponent_health_in(opponent_health),
     .player_line_in(player_line),
     .opponent_line_in(opponent_line),
+    .end_lose_screen(lose_color),
     .pixel_out(pixel_out)
   );
 
